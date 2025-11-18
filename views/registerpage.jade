@@ -1,0 +1,76 @@
+html
+  head
+    title 用户注册
+    style.
+      body {
+        background-image: url('https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1537261291133&di=c04553d39f158272a36be6e3ec0c8071&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fc2fdfc039245d6885bc3be94a2c27d1ed21b2438.jpg');
+        background-size: cover;
+        background-position: center;
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      #reg {
+        padding-top: 20px;
+        margin-top: 10%;
+        margin-left: 35%;
+        background: rgba(255, 255, 255, 0.8); /* Slight transparency */
+        width: 30%;
+        height: 45%;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        padding-bottom: 20px;
+      }
+
+      #reg h1 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      #reg input {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      #reg input[type='submit'] {
+        background-color: #74ebd5;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s ease;
+      }
+
+      #reg input[type='submit']:hover {
+        background-color: #66d1c8;
+      }
+
+      #reg a {
+        text-decoration: none;
+        color: #74ebd5;
+        font-size: 14px;
+      }
+
+      #reg a:hover {
+        color: #66d1c8;
+      }
+
+  body
+    div#reg
+      form(action='/register', method='post')
+        h1 用户注册
+        br
+        span 帐号:
+        input(type='text', name='username')
+        br
+        span 密码:
+        input(type='password', name='pwd')
+        br
+        br
+        input(type='submit', value='注册')

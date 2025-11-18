@@ -1,0 +1,13 @@
+html
+  head
+    title!= title
+  body
+    h1 亲爱的用户:#{username},猜你喜欢电影:
+    table(cellpadding="10" cellspacing="5" style="width: 100%; border-collapse: collapse;")
+         tr
+           -for(var i=0;i<movieinfo.length;i++)
+            td
+              p #{movieinfo[i].moviename}
+              img(src=movieinfo[i].picture)
+            -if((i+1)%5==0)
+             tr

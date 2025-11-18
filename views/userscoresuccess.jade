@@ -1,0 +1,28 @@
+html
+  head
+    title 评分成功
+  body
+    h1 亲爱的用户: #{user.username}, 祝贺评分成功!
+    a(href='/recommendmovieforuser?userid=#{user.userid}&username=#{user.username}', title='点击这里为您推荐电影') 点击这里为您推荐电影
+    style.
+      body {
+        background: #f9f9f9;
+        font-family: 'Segoe UI', sans-serif;
+        color: #333;
+        text-align: center;
+        padding: 50px 20px;
+      }
+      h1 {
+        font-size: 28px;
+        color: #0a3d62;
+        margin-bottom: 20px;
+      }
+      a {
+        text-decoration: none;
+        color: #74ebd5;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      a:hover {
+        color: #66d1c8;
+      }
