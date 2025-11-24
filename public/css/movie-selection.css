@@ -1,0 +1,80 @@
+/* movie-selection.css 的修改部分 */
+.movie-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: white;
+    cursor: pointer;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.movie-card:hover {
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.movie-card.selected {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.movie-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+    line-height: 1.4;
+}
+
+/* 移除或注释掉与图片相关的样式 */
+/*
+.movie-poster {
+    width: 120px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+*/
+
+/* 调整网格布局，因为现在只有文字，可以显示更多列 */
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 增加到6列 */
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+/* 响应式设计调整 */
+@media (max-width: 1024px) {
+    .movies-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .movies-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .movies-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .movie-card {
+        padding: 15px;
+        min-height: 60px;
+    }
+
+    .movie-title {
+        font-size: 14px;
+    }
+}

@@ -21,9 +21,10 @@ html(lang="zh-CN")
             li: a(href='#how-it-works') 使用指南
             li: a(href='#recommend') 推荐
             li: a(href='#library') 电影库
-            // 登录后显示我的评分
+            // 登录后显示我的评分和去评分
             if isLogin
               li: a(href=`/personalratings?userid=${userid}&username=${username}`) 我的评分
+              li: a(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
         // 登录/注册按钮区
         .auth-buttons
           if isLogin
@@ -98,7 +99,8 @@ html(lang="zh-CN")
         h2 准备好找到你可能喜欢的电影了吗？
         p 为电影评分，解锁更精准的推荐
         if isLogin
-          a.btn.btn-cta(href=`/personalratings?userid=${userid}&username=${username}`) 去评分
+          // 修改这里：将原来的 personalratings 改为 select-movies
+          a.btn.btn-cta(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
         else
           button.btn.btn-cta(onclick="window.location.href='/loginpage'") 登录后评分
         .tip 登录后可保存评分记录，持续优化推荐结果

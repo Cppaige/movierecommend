@@ -114,6 +114,81 @@ app.post('/register',function (req,res) {
         res.render('registersuccess',{title:'注册成功',message:name});
     })
 })
+
+/**
+ * 跳转到电影选择页面
+ */
+app.get('/select-movies', function (req, res) {
+    var userid = req.query.userid;
+    var username = req.query.username;
+
+    // 从数据库获取所有电影
+    var selectAllMoviesSQL = "select movieid, moviename, picture from movieinfo limit 200"; // 限制数量避免过多
+
+    connection.query(selectAllMoviesSQL, function(err, rows, fields) {
+        if (err) throw err;
+
+        // 将电影分成批次，每批10部
+        var batchSize = 10;
+        var movieBatches = [];
+        for (var i = 0; i < rows.length; i += batchSize) {
+            movieBatches.push(rows.slice(i, i + batchSize));
+        }
+
+        var currentBatchIndex = 0;
+        var totalBatches = movieBatches.length;
+        var minSelectionRequired = 5; // 至少选择5部电影
+
+        res.render('movie-selection', {
+            title: '选择看过的电影',
+            username: username,
+            userid: userid,
+            movieBatches: movieBatches,
+            currentBatchIndex: currentBatchIndex,
+            totalBatches: totalBatches,
+            minSelectionRequired: minSelectionRequired
+        });
+    });
+});
+
+/**
+ * 处理选择的电影并跳转到评分页面
+ */
+app.post('/rate-movies', function (req, res) {
+    var userid = req.body.userid;
+    var selectedMovieIds = req.body.selectedMovieIds;
+
+    console.log('Selected movie IDs:', selectedMovieIds);
+
+    // 如果selectedMovieIds是空字符串，转换为空数组
+    var movieIdArray = selectedMovieIds ? selectedMovieIds.split(',').filter(function(id) {
+        return id.trim() !== '';
+    }) : [];
+
+    if (movieIdArray.length === 0) {
+        // 如果没有选择电影，返回错误
+        return res.render('error', {
+            title: '错误',
+            message: '请至少选择一部电影进行评分'
+        });
+    }
+
+    // 根据选中的电影ID获取完整的电影信息
+    var placeholders = movieIdArray.map(function() { return '?'; }).join(',');
+    var selectMoviesSQL = "SELECT movieid, moviename, picture FROM movieinfo WHERE movieid IN (" + placeholders + ")";
+
+    connection.query(selectMoviesSQL, movieIdArray, function(err, rows, fields) {
+        if (err) throw err;
+
+        res.render('rating-page', {
+            title: '为电影评分',
+            username: req.body.username || '用户',
+            userid: userid,
+            selectedMovies: rows
+        });
+    });
+});
+
 /**
  * 把用户评分写入数据库
  */
@@ -175,8 +250,16 @@ app.get('/recommendmovieforuser',function (req,res) {
     //console.log('recommendation userid is:'+userid);
     const path = '/input_spark';
     //调用Spark程序为用户推荐电影并把推荐结果写入数据库
-    let spark_submit = spawnSync('/usr/local/spark/bin/spark-submit',['--class', 'recommend.MovieLensALS',' ~/IdeaProjects/Film_Recommend/out/artifacts/Film_Recommend_jar/Film_Recommend.jar', path, userid],{ shell:true, encoding: 'utf8' });
-    //console.log('spark running result is:'+spark_submit.stdout);
+    var spark_submit = spawnSync('/usr/local/spark/bin/spark-submit',[
+        '--class',
+        'recommend.MovieLensALS',
+        '~/IdeaProjects/Film_Recommend/out/artifacts/Film_Recommend_jar/Film_Recommend.jar',
+        path,
+        userid
+    ], {
+        shell: true,
+        encoding: 'utf8'
+    });    //console.log('spark running result is:'+spark_submit.stdout);
     //从数据库中读取推荐结果,把推荐结果显示到网页
     var selectRecommendResultSQL="select recommendresult.userid,recommendresult.movieid,recommendresult.rating,recommendresult.moviename,movieinfo.picture from recommendresult inner join movieinfo on recommendresult.movieid=movieinfo.movieid where recommendresult.userid="+userid;
     var movieinfolist=[];
