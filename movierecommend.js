@@ -291,6 +291,10 @@ app.get('/recommendmovieforuser',function (req,res) {
 
 });
 
-var  server=app.listen(3000,function () {
+var server = app.listen(3000, '0.0.0.0', function () {
+    var host = server.address().address;
+    var port = server.address().port;
     console.log("movierecommend server start......");
+    console.log("本地访问: http://localhost:%s", port);
+    console.log("网络访问: http://%s:%s", host === '::' ? '0.0.0.0' : host, port);
 });
