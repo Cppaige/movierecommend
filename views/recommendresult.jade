@@ -1,13 +1,170 @@
 html
   head
     title!= title
+    style.
+      #loadingSection {
+        text-align: center;
+        padding: 50px 20px;
+        background: #ffffff;
+      }
+      #resultSection {
+        display: none;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #1a1a1a;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      .progress-container {
+        width: 80%;
+        max-width: 400px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        margin: 20px auto;
+        overflow: hidden;
+      }
+      .progress-bar {
+        height: 20px;
+        background: linear-gradient(90deg, #1a1a1a, #333333);
+        border-radius: 10px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      .progress-text {
+        font-size: 18px;
+        color: #333333;
+        margin: 10px 0;
+      }
+      .progress-percentage {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1a1a1a;
+        margin: 10px 0;
+      }
+      .loading-steps {
+        margin: 20px 0;
+        color: #666666;
+      }
+      .step {
+        margin: 8px 0;
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+      }
+      .step.active {
+        opacity: 1;
+        color: #1a1a1a;
+        font-weight: bold;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      td {
+        padding: 10px;
+        text-align: center;
+        vertical-align: top;
+        border: 1px solid #ddd;
+      }
+      img {
+        max-width: 150px;
+        max-height: 200px;
+        display: block;
+        margin: 0 auto;
+      }
+    script.
+      let currentProgress = 0;
+      const userid = '#{userid}';
+
+      function checkProgress() {
+        fetch(`/recommendprogress?userid=${userid}`)
+          .then(response => response.json())
+          .then(data => {
+            updateProgressDisplay(data.progress, data.message);
+
+            if (data.status === 'completed' || data.progress >= 100) {
+              // 进度完成，显示结果
+              setTimeout(showResults, 1000);
+            } else if (data.status === 'error') {
+              // 出错情况
+              document.getElementById('progressText').textContent = '进度检查失败，正在尝试重新连接...';
+              setTimeout(checkProgress, 3000);
+            } else {
+              // 继续检查进度
+              setTimeout(checkProgress, 2000);
+            }
+          })
+          .catch(error => {
+            console.error('进度检查失败:', error);
+            document.getElementById('progressText').textContent = '连接失败，正在重试...';
+            setTimeout(checkProgress, 3000);
+          });
+      }
+
+      function updateProgressDisplay(progress, message) {
+        document.getElementById('progressBar').style.width = progress + '%';
+        document.getElementById('progressPercentage').textContent = Math.round(progress) + '%';
+        document.getElementById('progressText').textContent = message;
+
+        // 更新步骤状态
+        updateSteps(progress);
+      }
+
+      function updateSteps(progress) {
+        const steps = document.querySelectorAll('.step');
+        steps.forEach((step, index) => {
+          if (progress >= (index + 1) * 25) {
+            step.classList.add('active');
+          } else {
+            step.classList.remove('active');
+          }
+        });
+      }
+
+      function showResults() {
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('resultSection').style.display = 'block';
+      }
+
+      // 页面加载后开始检查真实进度
+      window.onload = function() {
+        checkProgress();
+      };
   body
-    h1 亲爱的用户:#{username},猜你喜欢电影:
-    table(cellpadding="10" cellspacing="5" style="width: 100%; border-collapse: collapse;")
-         tr
-           -for(var i=0;i<movieinfo.length;i++)
-            td
-              p #{movieinfo[i].moviename}
-              img(src=movieinfo[i].picture)
-            -if((i+1)%5==0)
-             tr
+    #loadingSection
+      .spinner
+      .progress-percentage#progressPercentage 0%
+      .progress-text#progressText 正在初始化推荐引擎...
+      .progress-container
+        .progress-bar#progressBar
+      .loading-steps
+        .step 1. 初始化Spark推荐引擎
+        .step 2. 加载用户历史数据
+        .step 3. 运行ALS协同过滤算法
+        .step 4. 生成最终推荐结果
+
+    #resultSection
+      h1 亲爱的用户:#{username},猜你喜欢电影:
+      if movieinfo && movieinfo.length > 0
+        table(cellpadding="10" cellspacing="5")
+          tr
+            - for(var i = 0; i < movieinfo.length; i++)
+              td
+                p #{movieinfo[i].moviename}
+                if movieinfo[i].picture
+                  img(src=movieinfo[i].picture, alt=movieinfo[i].moviename)
+                else
+                  p (暂无图片)
+                p 推荐度: #{movieinfo[i].rating ? movieinfo[i].rating.toFixed(1) : 'N/A'}
+              - if((i + 1) % 5 == 0 && i + 1 < movieinfo.length)
+                tr
+      else
+        p 暂无推荐结果，请先评分更多电影。

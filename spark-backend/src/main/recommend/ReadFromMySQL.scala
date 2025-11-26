@@ -19,7 +19,7 @@ object ReadFromMySQL
       option("driver","com.mysql.jdbc.Driver").
       option("dbtable", "personalratings").
       option("user", "root").
-      option("password", "xiaojia0806").load()
+      option("password", "202325330111").load()
     personalRatingsDF.show()
     personalRatingsDF.createOrReplaceTempView("personalratings")
     val prDF=spark.sql("select * from personalratings where userid="+userid)
