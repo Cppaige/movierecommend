@@ -1,0 +1,212 @@
+/* ==========================================
+   电影评分页 - 黑白简约风格（与选择页一致）
+   适配：移动端、平板、桌面端
+   核心：灰度配色 + 简洁布局 + 统一交互效果 + 均匀单元格
+========================================== */
+
+/* 基础重置 & 全局样式（与选择页保持一致） */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+    background-color: #f9f9f9; /* 浅灰背景（与选择页一致） */
+    color: #333; /* 深灰主文字 */
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* 页面容器 */
+.rating-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 页面标题 */
+h1 {
+    font-size: 26px;
+    color: #222; /* 更深灰标题 */
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 600;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0; /* 浅灰分隔线（与选择页一致） */
+}
+
+/* 评分表单 */
+.rating-form {
+    width: 100%;
+}
+
+/* 电影评分表格（核心布局） */
+.movie-rating-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    table-layout: fixed; /* 新增：固定表格布局，确保单元格宽度均匀 */
+}
+
+.movie-rating-table td {
+    padding: 15px;
+    text-align: center;
+    vertical-align: top;
+    border: 1px solid #f0f0f0; /* 浅灰边框分隔单元格 */
+    border-radius: 8px;
+    background-color: #fff; /* 白色单元格背景 */
+    margin: 5px; /* 配合 border-collapse 实现间距效果 */
+    /* 新增：强制均匀宽度 + 文字自动换行 */
+    width: 20%; /* 桌面端每行5列，每列占20% */
+    word-wrap: break-word; /* 长文字自动换行 */
+    word-break: break-all; /* 英文/数字也自动换行，避免撑宽 */
+}
+
+/* 电影名称 */
+.movie-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    /* 修正：去掉固定高度，改用最小高度+自动换行，适配长名称 */
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px; /* 增加左右内边距，避免文字贴边 */
+}
+
+/* 电影海报（彩色图片 + 圆角） */
+.movie-poster {
+    width: 100%; /* 修正：用百分比宽度，适配单元格大小 */
+    max-width: 120px; /* 限制最大宽度，避免过小/过大 */
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    /* 移除黑白滤镜，保持彩色图片 */
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0; /* 浅灰边框 */
+}
+
+.movie-poster:hover {
+    /* 移除黑白恢复效果，只保留悬停动画 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* 轻量阴影（与选择页一致） */
+}
+
+/* 评分下拉框 */
+.rating-select {
+    padding: 10px 12px;
+    border: 1px solid #d0d0d0; /* 浅灰边框 */
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    width: 80px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.rating-select:focus {
+    outline: none;
+    border-color: #888; /* 聚焦时深灰边框（与选择页输入框一致） */
+}
+
+/* 提交按钮（与选择页按钮风格统一） */
+.submit-button {
+    display: block;
+    margin: 0 auto;
+    padding: 12px 30px;
+    border: 1px solid #666; /* 中灰边框 */
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #f0f0f0;
+    border-color: #444; /* hover 时深灰边框（与选择页一致） */
+}
+
+.submit-button:active {
+    background-color: #e8e8e8;
+    transform: translateY(1px);
+}
+
+/* 响应式布局调整（适配多设备，保持均匀宽度） */
+@media (max-width: 1024px) {
+    /* 平板横屏：每行4部电影 */
+    .movie-rating-table td {
+        width: 25%; /* 4列，每列25% */
+    }
+}
+
+@media (max-width: 768px) {
+    /* 平板竖屏/大屏手机：每行3部电影 */
+    .movie-rating-table td {
+        width: 33.333%; /* 3列，每列33.333% */
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .movie-name {
+        font-size: 15px;
+        min-height: 35px;
+    }
+
+    .movie-poster {
+        max-width: 100px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* 手机：每行2部电影 */
+    .movie-rating-table td {
+        width: 50%; /* 2列，每列50% */
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 20px;
+        padding-bottom: 15px;
+    }
+
+    .movie-name {
+        font-size: 14px;
+        min-height: 30px;
+    }
+
+    .movie-poster {
+        max-width: 90px;
+        height: 135px;
+    }
+
+    .rating-select {
+        width: 70px;
+        padding: 8px 10px;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 320px) {
+    /* 小屏手机：每行1部电影 */
+    .movie-rating-table td {
+        width: 100%; /* 1列，占满宽度 */
+    }
+}
