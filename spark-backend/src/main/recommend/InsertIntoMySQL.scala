@@ -18,7 +18,7 @@ object InsertIntoMySQL
     val movieDF=spark.createDataFrame(rowRDD,schema)
     val prop = new Properties()
     prop.put("user", "root")
-    prop.put("password", "xiaojia0806")
+    prop.put("password", "202325330111")
     prop.put("driver","com.mysql.jdbc.Driver")
     movieDF.write.mode("append").jdbc("jdbc:mysql://localhost:3306/movierecommend", "movierecommend.recommendresult", prop)
     movieDF.show()

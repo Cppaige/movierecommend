@@ -7,7 +7,7 @@ object DeleteFromMySQL {
   val url = "jdbc:mysql://localhost:3306/movierecommend?useUnicode=true&characterEncoding=UTF-8"
   val prop = new java.util.Properties
   prop.setProperty("user", "root")
-  prop.setProperty("password", "xiaojia0806")
+  prop.setProperty("password", "202325330111")
   def delete(userid:Int): Unit = {
     var conn: Connection = null
     var ps: PreparedStatement = null

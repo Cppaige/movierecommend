@@ -42,11 +42,11 @@ html(lang="zh-CN")
         .carousel
           .carousel-track
             .carousel-item
-              img(src='/images/1.jpg', alt='电影海报1')
+              img(src='https://media.themoviedb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', alt='Interstellar')
             .carousel-item
-              img(src='/images/1.jpg', alt='电影海报2')
+              img(src='https://media.themoviedb.org/t/p/w500/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg', alt='Inception')
             .carousel-item
-              img(src='/images/1.jpg', alt='电影海报3')
+              img(src='https://media.themoviedb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg', alt='Forrest Gump')
           // 轮播控制按钮
           .carousel-control.prev
             i.fas.fa-chevron-left
@@ -99,7 +99,6 @@ html(lang="zh-CN")
         h2 准备好找到你可能喜欢的电影了吗？
         p 为电影评分，解锁更精准的推荐
         if isLogin
-          // 修改这里：将原来的 personalratings 改为 select-movies
           a.btn.btn-cta(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
         else
           button.btn.btn-cta(onclick="window.location.href='/loginpage'") 登录后评分
@@ -133,7 +132,7 @@ html(lang="zh-CN")
       .movies-grid
         .movie-card
           .card-top
-            img(src='/images/1.jpg', alt='沙丘')
+            img(src='https://media.themoviedb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', alt='Dune')
             .rate-btn
               i.fas.fa-star
           .card-bottom
@@ -143,7 +142,7 @@ html(lang="zh-CN")
               span 8.0
         .movie-card
           .card-top
-            img(src='/images/1.jpg', alt='瞬息全宇宙')
+            img(src='https://media.themoviedb.org/t/p/w500/u68AjlvlutfEIcpmbYpKcdi09ut.jpg', alt='Everything Everywhere All at Once')
             .rate-btn
               i.fas.fa-star
           .card-bottom
@@ -153,7 +152,7 @@ html(lang="zh-CN")
               span 7.8
         .movie-card
           .card-top
-            img(src='/images/1.jpg', alt='奥本海默')
+            img(src='https://media.themoviedb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', alt='Oppenheimer')
             .rate-btn
               i.fas.fa-star
           .card-bottom
@@ -163,7 +162,7 @@ html(lang="zh-CN")
               span 8.6
         .movie-card
           .card-top
-            img(src='/images/1.jpg', alt='芭比')
+            img(src='https://media.themoviedb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg', alt='Barbie')
             .rate-btn
               i.fas.fa-star
           .card-bottom

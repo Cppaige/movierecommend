@@ -13,9 +13,9 @@ var mysql=require('mysql');
 var http = require("http");
 app.set('view engine', 'jade');
 app.set('views', './views');
-app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 /**
  * 配置MySQL
@@ -23,7 +23,7 @@ app.use(express.static('public'));
 var connection = mysql.createConnection({
     host     : '127.0.0.1',
     user     : 'root',
-    password : 'xiaojia0806',
+    password : '202325330111',
     database : 'movierecommend',
     port:'3306'
 });
@@ -72,22 +72,42 @@ app.post('/login',function (req,res) {
         var upperValue=movieinfolist.length;
         var movielist=[];
         var movieNumbers=10;
+        
+        // 安全检查：如果电影列表为空或数量不足，调整数量
+        if (movieinfolist.length === 0) {
+            movieNumbers = 0;
+        } else if (movieinfolist.length < movieNumbers) {
+            movieNumbers = movieinfolist.length;
+        }
+        
         for (var i=0;i<movieNumbers;i++){
             var index=randomFrom(lowerValue,upperValue);
-            movielist.push({
-                movieid:movieinfolist[index].movieid,
-                moviename:movieinfolist[index].moviename,
-                picture:movieinfolist[index].picture
-            });
+            // 安全检查：确保索引在有效范围内
+            if (movieinfolist[index]) {
+                movielist.push({
+                    movieid:movieinfolist[index].movieid,
+                    moviename:movieinfolist[index].moviename,
+                    picture:movieinfolist[index].picture
+                });
+            }
         }
 
-        res.render('index',{
-            title:'MovieMatrix - 智能电影推荐',
-            isLogin: true,
-            userid: rows[0].userid,
-            username: rows[0].username,
-            ratedMovies: []
-        });
+        if (rows && rows.length > 0) {
+            // 登录成功
+            res.render('index',{
+                title:'MovieMatrix - 智能电影推荐',
+                isLogin: true,
+                userid: rows[0].userid,
+                username: rows[0].username,
+                ratedMovies: []
+            });
+        } else {
+            // 登录失败
+            res.render('login', {
+                title: '登录',
+                error: '用户名或密码错误'
+            });
+        }
     });  // 闭合 connection.query 的回调
 
 });  // 关键：添加这一行，闭合整个 app.post('/login', ...) 接口
@@ -193,108 +213,184 @@ app.post('/rate-movies', function (req, res) {
  * 把用户评分写入数据库
  */
 
-app.post('/submituserscore',function (req,res) {
-    var  userid=req.body.userid;
-    var moviescores=[];
-    var movieids=[];
-    req.body.moviescore.forEach(function(score){
-        //console.log('the score is:'+score);
-        moviescores.push({moviescore:score});
-    });
-    req.body.movieid.forEach(function(id){
-        //console.log('the id is:'+id);
-        movieids.push({movieid:id});
-    });
+app.post('/submituserscore', function (req, res) {
+    console.log('=== 收到评分请求 ===');
+    console.log('完整请求体:', JSON.stringify(req.body, null, 2));
 
-    //for(var item in movieids){
-    //   console.log('item is:'+item);
-    //   console.log('movieid is:'+movieids[item].movieid);
-    //}
-    //for(var item in moviescores){
-    //   console.log('item is:'+item);
-    //   console.log('moviescore is:'+moviescores[item].moviescore);
-    //}
-    //删除该用户历史评分数据，为写入本次最新评分数据做准备
-    connection.query('delete from  personalratings where userid='+userid, function(err, result) {
-        if (err) throw err;
-        console.log('deleted');
-        //console.log(result);
-        //console.log('\n');
-    });
-    //生成评分时间戳
-    var mytimestamp =new Date().getTime().toString().slice(1,10);
-    //console.log('mytimestamp2 is:'+mytimestamp);
-    for(var item in movieids){
-        //把每条评分记录(userid,movieid,rating,timestamp)插入数据库
-        var personalratings={userid:userid,movieid:movieids[item].movieid,rating:moviescores[item].moviescore,timestamp:mytimestamp};
-        connection.query('insert into personalratings set ?',personalratings,function (err,rs) {
-        if (err) throw  err;
-        console.log('insert into personalrating success');
+    // 检查请求体
+    if (!req.body) {
+        console.error('错误: req.body 为 undefined');
+        return res.status(400).json({ error: '请求体为空' });
+    }
+
+    var userid = req.body.userid;
+
+    // 检查必要参数
+    if (!userid) {
+        console.error('错误: userid 缺失');
+        return res.status(400).json({ error: 'userid 参数缺失' });
+    }
+
+    if (!req.body.moviescore) {
+        console.error('错误: moviescore 缺失');
+        return res.status(400).json({ error: 'moviescore 参数缺失' });
+    }
+
+    // 同时支持 moveid 和 movieid
+    var movieidData = req.body.movieid || req.body.moveid;
+    if (!movieidData) {
+        console.error('错误: movieid/moveid 缺失');
+        return res.status(400).json({
+            error: 'movieid 参数缺失',
+            hint: '请检查前端是否发送了 movieid 或 moveid 字段'
         });
     }
-    var selectUserIdNameSQL='select userid,username from user where userid='+userid;
-    connection.query(selectUserIdNameSQL,function(err,rows,fields){
-        if (err) throw  err;
-        res.render('userscoresuccess',{title:'Personal Rating Success',user:rows[0]});
+
+    var moviescores = [];
+    var movieids = [];
+
+    // 安全地处理 moviescore
+    if (Array.isArray(req.body.moviescore)) {
+        req.body.moviescore.forEach(function(score) {
+            console.log('处理评分:', score);
+            moviescores.push({ moviescore: score });
+        });
+    } else {
+        console.error('错误: moviescore 不是数组');
+        return res.status(400).json({ error: 'moviescore 必须是数组' });
+    }
+
+    // 安全地处理 movieid (支持 moveid 和 movieid)
+    if (Array.isArray(movieidData)) {
+        movieidData.forEach(function(id) {
+            console.log('处理电影ID:', id);
+            movieids.push({ movieid: id });
+        });
+    } else {
+        console.error('错误: movieid/moveid 不是数组');
+        return res.status(400).json({ error: 'movieid 必须是数组' });
+    }
+
+    // 检查数组长度是否匹配
+    if (moviescores.length !== movieids.length) {
+        console.error('错误: 数组长度不匹配');
+        return res.status(400).json({
+            error: 'moviescore 和 movieid 数组长度不匹配',
+            moviescoreLength: moviescores.length,
+            movieidLength: movieids.length
+        });
+    }
+
+    console.log('处理完成: userid=', userid, '电影数量=', movieids.length);
+
+    // 删除该用户历史评分数据
+    connection.query('DELETE FROM personalratings WHERE userid = ?', [userid], function(err, result) {
+        if (err) {
+            console.error('删除历史评分失败:', err);
+            return res.status(500).json({ error: '数据库操作失败' });
+        }
+        console.log('用户 ' + userid + ' 的历史评分已删除');
+
+        // 生成评分时间戳
+        var mytimestamp = new Date().getTime().toString().slice(1, 10);
+        var completedInserts = 0;
+        var totalInserts = movieids.length;
+
+        // 如果没有评分数据，直接返回成功
+        if (totalInserts === 0) {
+            return handleSuccessResponse();
+        }
+
+        // 插入新的评分数据
+        for (var i = 0; i < movieids.length; i++) {
+            var personalratings = {
+                userid: userid,
+                movieid: movieids[i].movieid,
+                rating: moviescores[i].moviescore,
+                timestamp: mytimestamp
+            };
+
+            connection.query('INSERT INTO personalratings SET ?', personalratings, function (err, rs) {
+                if (err) {
+                    console.error('插入评分失败:', err);
+                } else {
+                    console.log('插入评分成功');
+                }
+
+                completedInserts++;
+                // 当所有插入操作完成时
+                if (completedInserts === totalInserts) {
+                    handleSuccessResponse();
+                }
+            });
+        }
     });
 
+    function handleSuccessResponse() {
+        var selectUserIdNameSQL = 'SELECT userid, username FROM user WHERE userid = ?';
+        connection.query(selectUserIdNameSQL, [userid], function(err, rows) {
+            if (err) {
+                console.error('查询用户信息失败:', err);
+                return res.status(500).json({ error: '查询用户信息失败' });
+            }
+
+            if (rows.length === 0) {
+                return res.status(404).json({ error: '用户不存在' });
+            }
+
+            res.render('userscoresuccess', {
+                title: 'Personal Rating Success',
+                user: rows[0]
+            });
+        });
+    }
 });
 
 /**
- * 调用Spark程序为用户推荐电影并把推荐结果写入数据库,把推荐结果显示到网页
+ * 为用户显示推荐结果（直接从数据库读取）
  */
-app.get('/recommendmovieforuser',function (req,res) {
-//console.log('result point 1');
-    const userid=req.query.userid;
-    const username=req.query.username;
-    //console.log('recommendation userid is:'+userid);
-    const path = '/input_spark';
-    //调用Spark程序为用户推荐电影并把推荐结果写入数据库
-    var spark_submit = spawnSync('/usr/local/spark/bin/spark-submit',[
-        '--class',
-        'recommend.MovieLensALS',
-        '~/IdeaProjects/Film_Recommend/out/artifacts/Film_Recommend_jar/Film_Recommend.jar',
-        path,
-        userid
-    ], {
-        shell: true,
-        encoding: 'utf8'
-    });    //console.log('spark running result is:'+spark_submit.stdout);
-    //从数据库中读取推荐结果,把推荐结果显示到网页
-    var selectRecommendResultSQL="select recommendresult.userid,recommendresult.movieid,recommendresult.rating,recommendresult.moviename,movieinfo.picture from recommendresult inner join movieinfo on recommendresult.movieid=movieinfo.movieid where recommendresult.userid="+userid;
-    var movieinfolist=[];
-    connection.query(selectRecommendResultSQL,function(err,rows,fields){
-        if (err) throw  err;
-        //console.log('result point 3');
-        //console.log('movieids length is:'+rows.length);
-        //console.log('movieid is:'+rows[0].movieid);
-        //console.log('moviename is:'+rows[0].moviename);
-        console.log('read recommend result from database');
+app.get('/recommendmovieforuser', function (req, res) {
+    const userid = req.query.userid;
+    const username = req.query.username;
 
-        for (var i=0;i<rows.length;i++){
-            console.log('forxunhuan:i='+i);
-            movieinfolist.push({userid:rows[i].userid,movieid:rows[i].movieid,rating:rows[i].rating,moviename:rows[i].moviename,picture:rows[i].picture});
+    console.log('为用户 ' + userid + ' 显示推荐结果...');
+
+    // 直接从数据库中读取推荐结果
+    var selectRecommendResultSQL = "SELECT recommendresult.userid, recommendresult.movieid, recommendresult.rating, movieinfo.moviename, movieinfo.picture FROM recommendresult INNER JOIN movieinfo ON recommendresult.movieid = movieinfo.movieid WHERE recommendresult.userid = ?";
+
+    var movieinfolist = [];
+    connection.query(selectRecommendResultSQL, [userid], function(err, rows, fields) {
+        if (err) {
+            console.error('读取推荐结果失败:', err);
+            return res.status(500).render('error', {
+                title: '错误',
+                message: '获取推荐结果失败'
+            });
         }
 
-        //for(var item in movieinfolist){
-        //   console.log('result point 6');
-        //   console.log('item is:'+item);
-        //   console.log('userid is:'+movieinfolist[item].userid);
-        //   console.log('movieid is:'+movieinfolist[item].movieid);
-        //   console.log('moviename is:'+movieinfolist[item].moviename);
-        //   console.log('rating is:'+movieinfolist[item].rating);
-        //   console.log('picture is:'+movieinfolist[item].picture);
-        //}
+        console.log('成功读取 ' + rows.length + ' 条推荐结果');
 
-        res.render('recommendresult', {title: 'Recommend Result', message: 'this is recommend for you',username:username,movieinfo:movieinfolist})
+        for (var i = 0; i < rows.length; i++) {
+            movieinfolist.push({
+                userid: rows[i].userid,
+                movieid: rows[i].movieid,
+                rating: rows[i].rating,
+                moviename: rows[i].moviename,
+                picture: rows[i].picture
+            });
+        }
+
+        res.render('recommendresult', {
+            title: '推荐结果',
+            message: '为您推荐的电影',
+            username: username,
+            movieinfo: movieinfolist,
+            userid: userid
         });
-
+    });
 });
 
-var server = app.listen(3000, '0.0.0.0', function () {
-    var host = server.address().address;
-    var port = server.address().port;
+
+var server = app.listen(3000, function () {
     console.log("movierecommend server start......");
-    console.log("本地访问: http://localhost:%s", port);
-    console.log("网络访问: http://%s:%s", host === '::' ? '0.0.0.0' : host, port);
 });
