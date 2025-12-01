@@ -31,9 +31,9 @@ mysql> describe movieinfo;
 | description | varchar(1000) | YES  |     | NULL    |       |
 | typelist    | varchar(255)  | YES  |     | NULL    |       |
 +-------------+---------------+------+-----+---------+-------+
-   数据库字符格式，如果可以是中文就很好，不行的话就算了。
-   movieid如果可以按顺序来就好了
-   信息最好不要有缺失
-   电影类型能正常
+   数据库字符格式，如果可以是中文就很好，不行的话就算了;
+   movieid如果可以按顺序来就好了;
+   信息最好不要有缺失;
+   电影类型能正常显示就好了;
    
 3. 根据数据库的movieinfo导出movies.dat，根据新的movies.dat模拟生成ratings.dat（训练数据），替换hdfs中的这两个dat。
