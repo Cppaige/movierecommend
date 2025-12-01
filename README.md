@@ -36,4 +36,4 @@ mysql> describe movieinfo;
    信息最好不要有缺失;
    电影类型能正常显示就好了;
    
-3. 根据数据库的movieinfo导出movies.dat，根据新的movies.dat模拟生成ratings.dat（训练数据），替换hdfs中的这两个dat。
+3. 根据数据库的movieinfo导出movies.dat，根据新的movies.dat模拟生成ratings.dat（训练数据），替换hdfs中的这两个dat。 *脚本C++已经准备好，只要第一步有了这两个就能弄出来了。
