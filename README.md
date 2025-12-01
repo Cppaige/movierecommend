@@ -12,4 +12,28 @@
 2. 数据库，电影的数据库如果能有
 3. 评论区，用户可以自由讨论的社区，如果更高级一点就是可以发帖子，像豆瓣那样。
 
-
+### 12.2
+**TO DO**
+1. 重新爬数据库
+mysql> describe movieinfo;
++-------------+---------------+------+-----+---------+-------+
+| Field       | Type          | Null | Key | Default | Extra |
++-------------+---------------+------+-----+---------+-------+
+| movieid     | int(11)       | NO   | PRI | 0       |       |
+| tmdbId      | int(11)       | YES  |     | NULL    |       |
+| moviename   | varchar(1000) | YES  |     | NULL    |       |
+| releasetime | date          | YES  |     | NULL    |       |
+| director    | varchar(1000) | YES  |     | NULL    |       |
+| leadactors  | varchar(1000) | YES  |     | NULL    |       |
+| picture     | varchar(1000) | YES  |     | NULL    |       |
+| averating   | double(11,1)  | YES  |     | NULL    |       |
+| numrating   | int(11)       | YES  |     | NULL    |       |
+| description | varchar(1000) | YES  |     | NULL    |       |
+| typelist    | varchar(255)  | YES  |     | NULL    |       |
++-------------+---------------+------+-----+---------+-------+
+   数据库字符格式，如果可以是中文就很好，不行的话就算了。
+   movieid如果可以按顺序来就好了
+   信息最好不要有缺失
+   电影类型能正常
+   
+3. 根据数据库的movieinfo导出movies.dat，根据新的movies.dat模拟生成ratings.dat（训练数据），替换hdfs中的这两个dat。
