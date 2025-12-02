@@ -3,14 +3,25 @@
 
 ## 问题 & 解决
 1. 数据库显示中文问题
-   > show create table movieinfo;
+   
+   `show create table movieinfo;`
    > 
    检查 CHARSET=utf8mb4,如果不是,执行:
    > 
-   > ALTER TABLE movieinfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   `ALTER TABLE movieinfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
    >
    personalratings同理.
+## 数据库使用
+清空表
+-- 清空单张表 `DELETE FROM 表名;`
 
+-- 带条件删除部分数据 `DELETE FROM 表名 WHERE 条件;`
+
+-- 清空多张表 `DELETE FROM 表1, 表2, 表3;`
+
+导出数据库 `mysqldump -u 用户名 -p 数据库名 > 导出的文件名.sql`
+
+运行sql文件 `mysql -u 用户名 -p 数据库名 < 文件.sql`
 
 ### TO DO LIST 必须解决
 1. **修改数据库**（可以直接改电影库，换一个数据集，或者修复图片问题，图片是一个外链，外链的网站打不开）== *重要！！* 辣椒油已解决
@@ -42,9 +53,10 @@ mysql> describe movieinfo;
 | description | varchar(1000) | YES  |     | NULL    |       |
 | typelist    | varchar(255)  | YES  |     | NULL    |       |
 +-------------+---------------+------+-----+---------+-------+
-   数据库字符格式，如果可以是中文就很好，不行的话就算了;
-   movieid如果可以按顺序来就好了;
-   信息最好不要有缺失;
-   电影类型能正常显示就好了;
+> 数据库字符格式中文;
+> movieid按顺序来;
+> 信息最好不要有缺失;
+> 电影类型正常显示;
    
 3. 根据数据库的movieinfo导出movies.dat，根据新的movies.dat模拟生成ratings.dat（训练数据），替换hdfs中的这两个dat。 *脚本C++已经准备好，只要第一步有了这两个就能弄出来了。
+
