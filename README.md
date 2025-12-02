@@ -4,8 +4,12 @@
 ## 问题 & 解决
 1. 数据库显示中文问题
    > show create table movieinfo;
+   > 
    检查 CHARSET=utf8mb4,如果不是,执行:
+   > 
    > ALTER TABLE movieinfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   >
+   personalratings同理.
 
 
 ### TO DO LIST 必须解决
