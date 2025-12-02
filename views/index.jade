@@ -40,29 +40,26 @@ block content
   // 使用指南区（黑色底色适配）
   section#how-it-works.how-it-works
     .section-head
-      h2 找到你的口味电影
-      p 三步解锁专属片单，精准匹配你的观影喜好
+      h2 Find Your Movie
+      p 三步解锁专属片单
     .steps-container
       .step
         .step-icon 1
         .step-content
           h3 登录注册
-          p 创建账号或登录，开启个性化推荐之旅
       .step
         .step-icon 2
         .step-content
           h3 评分电影
-          p 为看过的电影打分，让系统读懂你的口味
       .step
         .step-icon 3
         .step-content
           h3 获得推荐
-          p 基于你的评分，生成专属个性化片单
 
   // 评分入口区（黑色底色）
   section#rating-entry.rating-entry
     .entry-container
-      h2 准备好找到你可能喜欢的电影了吗？
+      h2 Ready To GO?
       p 为电影评分，解锁更精准的推荐
       if isLogin
         a.btn.btn-cta(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
@@ -78,6 +75,11 @@ block content
         .login-tip
           span 登录后解锁
           a.btn-login-small(href='/loginpage') 去登录
+      else if isLogin && ratedMovies.length > 0
+        .view-all-recommend
+          a.btn-view-recommend(href=`/recommendmovieforuser`)
+            i.fas.fa-th-large
+            | 查看完整推荐
     .movies-grid#recommend-grid
       if isLogin && ratedMovies.length > 0
         // 登录且有评分时显示推荐（由JS渲染）

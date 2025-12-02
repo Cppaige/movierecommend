@@ -133,6 +133,7 @@ body {
     justify-content: center;
     gap: 5px;
     font-size: 0; /* 移除空格 */
+    flex-direction: row-reverse; /* 反转顺序使hover效果正确 */
 }
 
 .rating-star {
@@ -156,12 +157,17 @@ body {
     transition: color 0.2s;
 }
 
-.rating-star:hover .star,
-.rating-star:hover ~ .rating-star .star,
-.rating-star input:checked ~ .rating-star .star,
-.rating-star input:checked + .star {
+/* 已选中的星星 */
+.rating-star.selected .star {
     color: #ffc107;
 }
+
+/* Hover效果 - 鼠标悬停及之前的所有星星 */
+.rating-star:hover .star,
+.rating-star:hover ~ .rating-star .star {
+    color: #ffd700;
+}
+
 .rating-star .star {
     display: inline-block;
 }
@@ -395,16 +401,6 @@ body {
     color: #ffc107;
 }
 
-.rating-star .star {
-    display: block;
-    transition: color 0.2s;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-}
-
-.rating-star:hover .star,
 .rating-star:hover ~ .rating-star .star {
     color: #ffd700;
 }

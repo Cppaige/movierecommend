@@ -15,8 +15,8 @@ function toggleMovieSelection(movieId) {
     const ratingSection = card.querySelector('.rating-section');
     const ratingValue = card.querySelector('.rating-value');
 
-    // 切换选择状态
-    checkbox.checked = !checkbox.checked;
+    // 不再这里切换，因为checkbox的点击已经自动切换了状态
+    // checkbox.checked = !checkbox.checked;
 
     if (checkbox.checked) {
         // 选择电影
@@ -29,8 +29,12 @@ function toggleMovieSelection(movieId) {
         }
 
         // 确保默认选中3星
-        const starInput = card.querySelector(`input[value="3"]`);
-        if (starInput) starInput.checked = true;
+        const starInput = card.querySelector(`input[name="rating_${movieId}"][value="3"]`);
+        if (starInput) {
+            starInput.checked = true;
+            // 手动触发一次评分更新以确保星星高亮显示
+            handleRatingChange(movieId, 3);
+        }
     } else {
         // 取消选择
         card.classList.remove('selected');
@@ -195,7 +199,7 @@ function renderCurrentBatch() {
                     name="selectedMovies"
                     id="checkbox-${movie.movieid}"
                     ${isSelected ? 'checked' : ''}
-                    onclick="toggleMovieSelection('${movie.movieid}')">
+                    onchange="toggleMovieSelection('${movie.movieid}')">
                 <label class="checkbox-label" for="checkbox-${movie.movieid}">选择</label>
             </div>
         `;

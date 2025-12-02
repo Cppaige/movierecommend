@@ -1,4 +1,4 @@
-extends layout
+extends layout-v2
 
 block content
   .movie-selection-container
@@ -116,7 +116,7 @@ block content
                       name='selectedMovies',
                       value=movie.movieid,
                       id=`checkbox-${movie.movieid}`,
-                      onclick=`toggleMovieSelection('${movie.movieid}')`
+                      onchange=`toggleMovieSelection('${movie.movieid}')`
                     )
                     label.checkbox-label(for=`checkbox-${movie.movieid}`)
                       i.fas.fa-check

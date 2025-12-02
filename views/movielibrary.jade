@@ -1,347 +1,100 @@
-extends layout
+extends layout-v2
 
 block content
-  .movie-library-container
+  .page-container
     // 页面头部
-    .library-header
-      h1 电影库
-      p 共 #{totalMovies} 部电影
-    
+    .page-header
+      h1
+        i.fas.fa-film
+        | 电影库
+      p.subtitle 共 #{totalMovies} 部精彩电影，等你来发现
+
     // 筛选和排序栏
-    .library-controls
-      .sort-controls
-        span.sort-label 排序方式：
-        a.sort-btn(href=`/movielibrary?sort=movieid&order=${orderBy === 'DESC' ? 'desc' : 'asc'}`, class=sortBy === 'movieid' ? 'active' : '') 默认
-        a.sort-btn(href=`/movielibrary?sort=averating&order=desc`, class=sortBy === 'averating' ? 'active' : '') 评分最高
-        a.sort-btn(href=`/movielibrary?sort=numrating&order=desc`, class=sortBy === 'numrating' ? 'active' : '') 最热门
-        a.sort-btn(href=`/movielibrary?sort=releasetime&order=desc`, class=sortBy === 'releasetime' ? 'active' : '') 最新上映
-    
+    .controls-bar
+      .controls-group
+        span.label 排序方式：
+        a.control-btn(href=`/movielibrary?sort=movieid&order=${orderBy === 'DESC' ? 'desc' : 'asc'}`, class=sortBy === 'movieid' ? 'active' : '')
+          i.fas.fa-list
+          | 默认
+        a.control-btn(href=`/movielibrary?sort=averating&order=desc`, class=sortBy === 'averating' ? 'active' : '')
+          i.fas.fa-star
+          | 评分最高
+        a.control-btn(href=`/movielibrary?sort=numrating&order=desc`, class=sortBy === 'numrating' ? 'active' : '')
+          i.fas.fa-fire
+          | 最热门
+        a.control-btn(href=`/movielibrary?sort=releasetime&order=desc`, class=sortBy === 'releasetime' ? 'active' : '')
+          i.fas.fa-calendar
+          | 最新上映
+
     // 电影网格
     .movies-grid
       each movie in movies
-        .movie-card
-          a.movie-link(href=`/movie/${movie.id}`)
+        .movie-card(data-movie-id=movie.id)
+          a(href=`/movie/${movie.id}`, style='display: block; text-decoration: none; color: inherit;')
             .card-top
-              img.poster(src=movie.poster, alt=movie.title, onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'")
-              .movie-overlay
+              img(src=movie.poster, alt=movie.title, onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'")
+              .card-overlay
                 .overlay-content
                   if movie.rating > 0
-                    .movie-rating
+                    .overlay-rating
                       i.fas.fa-star
-                      span #{movie.rating}
-                  .view-details 查看详情
-            .card-bottom
-              h3.movie-title #{movie.title}
-              .movie-meta
-                span.year #{movie.releaseDate}
+                      | #{movie.rating}
+                  .overlay-action 查看详情
+            .card-content
+              h3 #{movie.title}
+              .meta
                 if movie.genres.length > 0
                   span.genre #{movie.genres[0]}
-                .rating-badge
+                span.rating
                   i.fas.fa-star
-                  span #{movie.rating}
-              if movie.director
-                .movie-director 导演：#{movie.director}
-    
+                  | #{movie.rating}
+              if movie.releaseDate
+                p.year
+                  i.fas.fa-calendar-alt
+                  |  #{movie.releaseDate}
+
+          .card-actions
+            button.action-btn.favorite-btn(onclick=`toggleFavorite(${movie.id}, this); event.stopPropagation();`, title='收藏')
+              i.far.fa-heart
+
     // 分页控件
     if totalPages > 1
       .pagination
         if currentPage > 1
-          a.page-btn(href=`/movielibrary?page=${currentPage - 1}&sort=${sortBy}&order=${order}`) 上一页
-        
+          a.page-btn(href=`/movielibrary?page=${currentPage - 1}&sort=${sortBy}&order=${order}`)
+            i.fas.fa-chevron-left
+            | 上一页
+
         // 显示页码
         - var startPage = Math.max(1, currentPage - 2);
         - var endPage = Math.min(totalPages, currentPage + 2);
-        
+
         if startPage > 1
           a.page-btn(href=`/movielibrary?page=1&sort=${sortBy}&order=${order}`) 1
           if startPage > 2
             span.page-ellipsis ...
-        
+
         - for (var i = startPage; i <= endPage; i++)
           a.page-btn(href=`/movielibrary?page=${i}&sort=${sortBy}&order=${order}`, class=i === currentPage ? 'active' : '') #{i}
-        
+
         if endPage < totalPages
           if endPage < totalPages - 1
             span.page-ellipsis ...
           a.page-btn(href=`/movielibrary?page=${totalPages}&sort=${sortBy}&order=${order}`) #{totalPages}
-        
-        if currentPage < totalPages
-          a.page-btn(href=`/movielibrary?page=${currentPage + 1}&sort=${sortBy}&order=${order}`) 下一页
-    
-    // 统计信息
-    .library-stats
-      p 显示 #{movies.length} 部电影，第 #{currentPage} 页 / 共 #{totalPages} 页
 
-block styles
-  style.
-    .movie-library-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .library-header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .library-header h1 {
-      font-size: 2.5rem;
-      color: #333;
-      margin-bottom: 10px;
-    }
-    
-    .library-header p {
-      color: #666;
-      font-size: 1.1rem;
-    }
-    
-    .library-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-    }
-    
-    .sort-controls {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .sort-label {
-      font-weight: bold;
-      color: #555;
-    }
-    
-    .sort-btn {
-      padding: 8px 16px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      color: #666;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-    
-    .sort-btn:hover {
-      background: #007bff;
-      color: white;
-      border-color: #007bff;
-    }
-    
-    .sort-btn.active {
-      background: #007bff;
-      color: white;
-      border-color: #007bff;
-    }
-    
-    .movies-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 25px;
-      margin-bottom: 40px;
-    }
-    
-    .movie-card {
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .movie-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    }
-    
-    .movie-link {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-    
-    .card-top {
-      position: relative;
-      overflow: hidden;
-      aspect-ratio: 2/3;
-    }
-    
-    .poster {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s;
-    }
-    
-    .movie-card:hover .poster {
-      transform: scale(1.05);
-    }
-    
-    .movie-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .movie-card:hover .movie-overlay {
-      opacity: 1;
-    }
-    
-    .overlay-content {
-      text-align: center;
-      color: white;
-    }
-    
-    .movie-rating {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-    }
-    
-    .movie-rating i {
-      color: #ffc107;
-      margin-right: 5px;
-    }
-    
-    .view-details {
-      background: #007bff;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-    }
-    
-    .card-bottom {
-      padding: 15px;
-    }
-    
-    .movie-title {
-      font-size: 1.1rem;
-      margin: 0 0 10px 0;
-      color: #333;
-      line-height: 1.3;
-      height: 2.6em;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
-    
-    .movie-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      color: #666;
-    }
-    
-    .year {
-      background: #f0f0f0;
-      padding: 2px 8px;
-      border-radius: 10px;
-    }
-    
-    .genre {
-      background: #e3f2fd;
-      padding: 2px 8px;
-      border-radius: 10px;
-      color: #1976d2;
-    }
-    
-    .rating-badge {
-      display: flex;
-      align-items: center;
-      color: #ffc107;
-    }
-    
-    .rating-badge i {
-      margin-right: 3px;
-    }
-    
-    .movie-director {
-      font-size: 0.85rem;
-      color: #888;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 5px;
-      margin: 40px 0;
-      flex-wrap: wrap;
-    }
-    
-    .page-btn {
-      padding: 8px 16px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      color: #666;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-    
-    .page-btn:hover {
-      background: #f0f0f0;
-    }
-    
-    .page-btn.active {
-      background: #007bff;
-      color: white;
-      border-color: #007bff;
-    }
-    
-    .page-ellipsis {
-      padding: 8px 16px;
-      color: #999;
-    }
-    
-    .library-stats {
-      text-align: center;
-      color: #666;
-      font-size: 0.9rem;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-    
-    @media (max-width: 768px) {
-      .movies-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15px;
+        if currentPage < totalPages
+          a.page-btn(href=`/movielibrary?page=${currentPage + 1}&sort=${sortBy}&order=${order}`)
+            | 下一页
+            i.fas.fa-chevron-right
+
+block extraJS
+  script(src='/js/favorites.js')
+  script.
+    // 页面加载时检查收藏状态
+    document.addEventListener('DOMContentLoaded', function() {
+      const movieCards = document.querySelectorAll('.movie-card');
+      const movieIds = Array.from(movieCards).map(card => card.dataset.movieId).filter(id => id);
+      if (movieIds.length > 0 && window.appState.isLogin) {
+        checkFavoritesStatus(movieIds);
       }
-      
-      .library-controls {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .movies-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      }
-      
-      .sort-controls {
-        flex-wrap: wrap;
-      }
-    }
+    });

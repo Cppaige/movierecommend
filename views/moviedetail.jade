@@ -1,247 +1,100 @@
-extends layout
+extends layout-v2
 
 block content
-  .movie-detail-container
-    .movie-backdrop
-      .backdrop-overlay
-        .container
-          h1 #{movie.title}
-          .movie-meta
-            span #{movie.releaseYear}
-            span #{movie.rating}/10
-            if movie.votes > 0
-              span #{movie.votes.toLocaleString()} 人评分
+  .detail-container
+    // 背景图区域
+    .detail-backdrop(style=`background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.4)), url('${movie.backdrop || movie.poster}')`)
+      .detail-backdrop-content
+        h1 #{movie.title}
+        if movie.tagline
+          p.tagline #{movie.tagline}
+        .movie-meta
+          span.release-year #{movie.releaseYear}
+          span.dot •
+          if movie.runtime
+            span.runtime #{movie.runtime}分钟
+          span.dot •
+          span.rating
+            i.fas.fa-star
+            | #{movie.rating}/10
+          if movie.votes > 0
+            span.dot •
+            span.votes #{movie.votes.toLocaleString()} 人评分
 
-    .container
-      .movie-content
-        .poster-side
-          img.movie-poster(src=movie.poster, alt=movie.title)
-          .action-buttons
-            button.btn-watch
-              i.fas.fa-play
-              | 添加到想看列表
-            button.btn-rate
-              i.fas.fa-star
-              | 立即评分
+    // 主要内容区域
+    .detail-content
+      // 海报区域 - 左侧
+      .detail-sidebar
+        img(src=movie.poster, alt=movie.title, loading="lazy")
 
-        .info-side
-          .info-section
-            h3 剧情简介
-            p #{movie.description || '暂无简介'}
+        // 收藏按钮
+        button.btn.btn-primary.favorite-btn(data-movie-id=movie.id, onclick=`toggleFavorite(${movie.id}, this)`)
+          i.far.fa-heart
+          span 收藏这部电影
 
-          .info-section
-            h3 导演
-            p #{movie.director || '未知'}
+        // 评分卡片
+        .card.rating-card
+          div.rating-display
+            span.rating-value #{movie.rating}
+            span.rating-max /10
+          span.rating-label 用户评分
+          if movie.votes > 0
+            span.rating-count #{movie.votes.toLocaleString()} 人评分
 
-          .info-section
-            h3 主演
-            p #{movie.actors || '未知'}
+      // 详情信息区域 - 右侧
+      .detail-main
+        // 剧情简介
+        .detail-section
+          h2 剧情简介
+          p #{movie.description || '暂无简介'}
 
-          .info-section
-            h3 类型
-            .genres
-              each genre in movie.genres
-                span.genre-tag #{genre}
+        // 基本信息
+        .detail-section
+          h2 基本信息
+          .detail-info-grid
+            span.detail-label 导演：
+            span.detail-value #{movie.director || '未知'}
 
-          .info-section
-            h3 详细信息
-            .details-grid
-              .detail-item
-                span.label 上映时间：
-                span.value #{movie.releaseDate || '未知'}
-              .detail-item
-                span.label 评分：
-                span.value #{movie.rating}/10
-              if movie.votes > 0
-                .detail-item
-                  span.label 评分人数：
-                  span.value #{movie.votes.toLocaleString()}
+            span.detail-label 编剧：
+            span.detail-value #{movie.writer || '未知'}
 
-    .back-link
-      a(href="/movielibrary") ← 返回电影库
+            span.detail-label 主演：
+            span.detail-value #{movie.actors || '未知'}
 
-block styles
-  style.
-    .movie-detail-container {
-      background: #f5f5f5;
-      min-height: 100vh;
-    }
+            span.detail-label 类型：
+            .detail-value
+              if movie.genres.length > 0
+                each genre in movie.genres
+                  span.genre #{genre}
+              else
+                | 未知
 
-    .movie-backdrop {
-      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-                  url('#{movie.poster}') center/cover;
-      color: white;
-      padding: 60px 0;
-    }
+            span.detail-label 上映日期：
+            span.detail-value #{movie.releaseDate || '未知'}
 
-    .backdrop-overlay {
-      background: rgba(0,0,0,0.5);
-      padding: 20px;
-    }
+            span.detail-label 制片国家/地区：
+            span.detail-value #{movie.country || '未知'}
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
+            span.detail-label 语言：
+            span.detail-value #{movie.language || '未知'}
 
-    .movie-backdrop h1 {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-    }
+            if movie.imdbRating
+              span.detail-label IMDb评分：
+              span.detail-value #{movie.imdbRating}
 
-    .movie-meta {
-      display: flex;
-      gap: 20px;
-      font-size: 1.1rem;
-      color: #ddd;
-    }
+    // 返回链接
+    .page-actions(style='margin-top: 40px;')
+      a.btn.btn-secondary(href="/movielibrary")
+        i.fas.fa-arrow-left
+        | 返回电影库
 
-    .movie-content {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 40px;
-      padding: 40px 0;
-      background: white;
-      margin-top: -50px;
-      border-radius: 10px;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    .poster-side {
-      text-align: center;
-    }
-
-    .movie-poster {
-      width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    }
-
-    .action-buttons {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .btn-watch, .btn-rate {
-      padding: 12px;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.3s;
-    }
-
-    .btn-watch {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-watch:hover {
-      background: #c82333;
-    }
-
-    .btn-rate {
-      background: #ffc107;
-      color: #333;
-    }
-
-    .btn-rate:hover {
-      background: #e0a800;
-    }
-
-    .info-side {
-      padding-right: 20px;
-    }
-
-    .info-section {
-      margin-bottom: 30px;
-    }
-
-    .info-section h3 {
-      font-size: 1.3rem;
-      color: #333;
-      margin-bottom: 10px;
-      padding-bottom: 5px;
-      border-bottom: 2px solid #007bff;
-      display: inline-block;
-    }
-
-    .info-section p {
-      line-height: 1.6;
-      color: #555;
-    }
-
-    .genres {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .genre-tag {
-      background: #e3f2fd;
-      color: #1976d2;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-    }
-
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    .detail-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .label {
-      color: #666;
-      font-weight: bold;
-    }
-
-    .value {
-      color: #333;
-    }
-
-    .back-link {
-      text-align: center;
-      padding: 30px 0;
-    }
-
-    .back-link a {
-      color: #007bff;
-      text-decoration: none;
-      font-size: 1.1rem;
-    }
-
-    .back-link a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 900px) {
-      .movie-content {
-        grid-template-columns: 1fr;
-        gap: 30px;
+block extraJS
+  script(src='/js/favorites.js')
+  script.
+    // 页面加载时检查收藏状态
+    document.addEventListener('DOMContentLoaded', function() {
+      const movieId = document.querySelector('.favorite-btn').dataset.movieId;
+      if (movieId && window.appState.isLogin) {
+        checkFavoritesStatus([movieId]);
       }
-
-      .poster-side {
-        max-width: 300px;
-        margin: 0 auto;
-      }
-
-      .info-side {
-        padding: 0 20px;
-      }
-    }
+    });

@@ -24,9 +24,9 @@ html(lang="zh-CN")
             li: a(href='/movielibrary') 电影库
             // 登录后显示我的评分和去评分
             if isLogin
+              li: a(href=`/favorites`) 我的收藏
               li: a(href=`/myratings`) 我的评分
               li: a(href=`/select-movies`) 去评分
-            // 电影库链接已移到上面，这里可以放其他链接
         // 登录/注册按钮区
         .auth-buttons
           if isLogin

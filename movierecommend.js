@@ -74,8 +74,9 @@ function requireLogin(req, res, next) {
  * 跳转到网站首页
  */
 app.get('/', function (req, res) {
-    // 如果用户已登录，获取他们的评分记录
+    // 如果用户已登录，获取他们的评分记录和推荐电影
     var ratedMovies = [];
+    var recommendedMovies = [];
 
     if (req.session.isLoggedIn) {
         var userId = req.session.userId;
@@ -90,18 +91,47 @@ app.get('/', function (req, res) {
                 ratedMovies = rows.map(row => row.movieid);
             }
 
-            // 渲染首页
-            res.render('index', {
-                title: 'MovieMatrix - 智能电影推荐',
-                ratedMovies: ratedMovies
-                // isLogin, userid, username 已经在 res.locals 中
-            });
+            // 如果用户已评分，获取推荐电影（首页展示前8部）
+            if (ratedMovies.length > 0) {
+                var recommendSQL = `
+                    SELECT m.movieid, m.moviename, m.picture, m.averating, m.typelist
+                    FROM recommendmovie r
+                    JOIN movie m ON r.recommendmovieid = m.movieid
+                    WHERE r.userid = ?
+                    ORDER BY r.degree DESC
+                    LIMIT 8
+                `;
+
+                connection.query(recommendSQL, [userId], function(err, recommendRows) {
+                    if (err) {
+                        console.error('查询推荐电影错误:', err);
+                    } else {
+                        recommendedMovies = recommendRows;
+                    }
+
+                    // 渲染首页
+                    res.render('index-v2', {
+                        title: 'MovieMatrix - 智能电影推荐',
+                        ratedMovies: ratedMovies,
+                        recommendedMovies: recommendedMovies
+                        // isLogin, userid, username 已经在 res.locals 中
+                    });
+                });
+            } else {
+                // 没有评分记录，直接渲染
+                res.render('index-v2', {
+                    title: 'MovieMatrix - 智能电影推荐',
+                    ratedMovies: ratedMovies,
+                    recommendedMovies: []
+                });
+            }
         });
     } else {
         // 未登录用户
-        res.render('index', {
+        res.render('index-v2', {
             title: 'MovieMatrix - 智能电影推荐',
-            ratedMovies: []
+            ratedMovies: [],
+            recommendedMovies: []
         });
     }
 });
@@ -261,7 +291,7 @@ app.get('/movie-selection-rating', function(req, res) {
 
     // 获取电影数据（分批次显示）
     connection.query(
-        "SELECT movieid, moviename, picture FROM movieinfo ORDER BY RAND() LIMIT 100",
+        "SELECT movieid, moviename, picture, typelist, averating FROM movieinfo ORDER BY RAND() LIMIT 100",
         function(error, results, fields) {
             if (error) {
                 console.log("查询电影失败: " + error);
@@ -279,7 +309,7 @@ app.get('/movie-selection-rating', function(req, res) {
             res.render('movie-selection-rating', {
                 username: username,
                 userid: userid,
-                minSelectionRequired: 5, // 最少选择5部
+                minSelectionRequired: 10, // 最少选择10部
                 currentBatchIndex: 0,
                 totalBatches: batches.length,
                 movieBatches: batches
@@ -935,4 +965,227 @@ app.post('/startrecommend', (req, res) => {
     spark.stderr.on("data", d => console.error("Spark ERROR:", d.toString()));
 
     res.json({ status: "started" });
+});
+
+/**
+ * 收藏夹相关API
+ */
+
+// 添加收藏（支持分类）
+app.post('/api/favorites/add', function(req, res) {
+    if (!req.session.isLoggedIn) {
+        return res.status(401).json({ success: false, message: '请先登录' });
+    }
+
+    const userid = req.session.userId;
+    const movieid = req.body.movieid;
+    const category = req.body.category || 'liked'; // 默认为"喜欢"
+
+    if (!movieid) {
+        return res.status(400).json({ success: false, message: '缺少电影ID' });
+    }
+
+    // 验证分类
+    const validCategories = ['want_watch', 'watched', 'liked'];
+    if (!validCategories.includes(category)) {
+        return res.status(400).json({ success: false, message: '无效的分类' });
+    }
+
+    // 检查是否已在该分类中收藏
+    const checkSQL = "SELECT * FROM favorites WHERE userid = ? AND movieid = ? AND category = ?";
+    connection.query(checkSQL, [userid, movieid, category], function(err, rows) {
+        if (err) {
+            console.error('检查收藏失败:', err);
+            return res.status(500).json({ success: false, message: '数据库错误' });
+        }
+
+        if (rows.length > 0) {
+            return res.json({ success: false, message: '已经收藏过了', alreadyExists: true });
+        }
+
+        // 添加收藏
+        const insertSQL = "INSERT INTO favorites (userid, movieid, category) VALUES (?, ?, ?)";
+        connection.query(insertSQL, [userid, movieid, category], function(err, result) {
+            if (err) {
+                console.error('添加收藏失败:', err);
+                return res.status(500).json({ success: false, message: '添加收藏失败' });
+            }
+
+            res.json({ success: true, message: '收藏成功', category: category });
+        });
+    });
+});
+
+// 取消收藏
+app.post('/api/favorites/remove', function(req, res) {
+    if (!req.session.isLoggedIn) {
+        return res.status(401).json({ success: false, message: '请先登录' });
+    }
+
+    const userid = req.session.userId;
+    const movieid = req.body.movieid;
+
+    if (!movieid) {
+        return res.status(400).json({ success: false, message: '缺少电影ID' });
+    }
+
+    const deleteSQL = "DELETE FROM favorites WHERE userid = ? AND movieid = ?";
+    connection.query(deleteSQL, [userid, movieid], function(err, result) {
+        if (err) {
+            console.error('取消收藏失败:', err);
+            return res.status(500).json({ success: false, message: '取消收藏失败' });
+        }
+
+        res.json({ success: true, message: '已取消收藏' });
+    });
+});
+
+// 获取用户的所有收藏（支持分类筛选）
+app.get('/api/favorites/list', function(req, res) {
+    if (!req.session.isLoggedIn) {
+        return res.status(401).json({ success: false, message: '请先登录' });
+    }
+
+    const userid = req.session.userId;
+    const category = req.query.category; // 可选：按分类筛选
+
+    let selectSQL = `
+        SELECT f.id, f.movieid, f.category, f.rating, f.note, f.createtime,
+               m.moviename, m.picture, m.averating, m.typelist, m.releasetime, m.director
+        FROM favorites f
+        LEFT JOIN movieinfo m ON f.movieid = m.movieid
+        WHERE f.userid = ?
+    `;
+
+    const params = [userid];
+
+    if (category && ['want_watch', 'watched', 'liked'].includes(category)) {
+        selectSQL += ' AND f.category = ?';
+        params.push(category);
+    }
+
+    selectSQL += ' ORDER BY f.createtime DESC';
+
+    connection.query(selectSQL, params, function(err, rows) {
+        if (err) {
+            console.error('获取收藏列表失败:', err);
+            return res.status(500).json({ success: false, message: '获取收藏列表失败' });
+        }
+
+        res.json({ success: true, favorites: rows });
+    });
+});
+
+// 获取收藏数量统计
+app.get('/api/favorites/count', function(req, res) {
+    if (!req.session.isLoggedIn) {
+        return res.json({ success: true, count: 0, byCategory: {} });
+    }
+
+    const userid = req.session.userId;
+
+    const countSQL = `
+        SELECT
+            category,
+            COUNT(*) as count
+        FROM favorites
+        WHERE userid = ?
+        GROUP BY category
+    `;
+
+    connection.query(countSQL, [userid], function(err, rows) {
+        if (err) {
+            console.error('获取收藏数量失败:', err);
+            return res.status(500).json({ success: false, message: '获取收藏数量失败' });
+        }
+
+        const byCategory = {
+            want_watch: 0,
+            watched: 0,
+            liked: 0
+        };
+
+        let totalCount = 0;
+
+        rows.forEach(row => {
+            byCategory[row.category] = row.count;
+            totalCount += row.count;
+        });
+
+        res.json({
+            success: true,
+            count: totalCount,
+            byCategory: byCategory
+        });
+    });
+});
+
+// 检查电影是否已收藏
+app.get('/api/favorites/check/:movieid', function(req, res) {
+    if (!req.session.isLoggedIn) {
+        return res.json({ success: true, favorited: false });
+    }
+
+    const userid = req.session.userId;
+    const movieid = req.params.movieid;
+
+    const checkSQL = "SELECT * FROM favorites WHERE userid = ? AND movieid = ?";
+    connection.query(checkSQL, [userid, movieid], function(err, rows) {
+        if (err) {
+            console.error('检查收藏状态失败:', err);
+            return res.status(500).json({ success: false, message: '检查收藏状态失败' });
+        }
+
+        res.json({ success: true, favorited: rows.length > 0 });
+    });
+});
+
+// 收藏夹页面
+app.get('/favorites', function(req, res) {
+    if (!req.session.isLoggedIn) {
+        return res.redirect('/loginpage');
+    }
+
+    const userid = req.session.userId;
+    const username = req.session.username;
+
+    const selectSQL = `
+        SELECT f.movieid, f.createtime, m.moviename, m.picture, m.averating, m.typelist, m.releasetime, m.director
+        FROM favorites f
+        LEFT JOIN movieinfo m ON f.movieid = m.movieid
+        WHERE f.userid = ?
+        ORDER BY f.createtime DESC
+    `;
+
+    connection.query(selectSQL, [userid], function(err, rows) {
+        if (err) {
+            console.error('获取收藏列表失败:', err);
+            // 如果表不存在，返回空列表
+            return res.render('favorites', {
+                title: '我的收藏 - MovieMatrix',
+                username: username,
+                favorites: []
+            });
+        }
+
+        // 格式化数据
+        const favorites = rows.map(function(item) {
+            return {
+                id: item.movieid,
+                title: item.moviename || '未知电影',
+                poster: item.picture || 'https://via.placeholder.com/300x450?text=No+Image',
+                rating: item.averating ? item.averating.toFixed(1) : '0.0',
+                genres: item.typelist ? item.typelist.split(',').slice(0, 3) : [],
+                releaseYear: item.releasetime ? new Date(item.releasetime).getFullYear() : '未知',
+                director: item.director || '未知',
+                addedDate: item.createtime
+            };
+        });
+
+        res.render('favorites', {
+            title: '我的收藏 - MovieMatrix',
+            username: username,
+            favorites: favorites
+        });
+    });
 });
