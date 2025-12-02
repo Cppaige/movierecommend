@@ -4,7 +4,7 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 object DeleteFromMySQL {
 
-  val url = "jdbc:mysql://localhost:3306/movierecommend?useUnicode=true&characterEncoding=UTF-8"
+  val url = "jdbc:mysql://localhost:3306/movierecommend"
   val prop = new java.util.Properties
   prop.setProperty("user", "root")
   prop.setProperty("password", "202325330111")

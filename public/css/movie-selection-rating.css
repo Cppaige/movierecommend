@@ -1,0 +1,1047 @@
+/* movie-selection-rating.css */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.movie-selection-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.header p {
+    color: #666;
+    font-size: 16px;
+}
+
+.search-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.search-button {
+    padding: 12px 30px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.search-button:hover {
+    background: #764ba2;
+}
+
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.movie-card {
+    background: #fff;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.movie-card:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+}
+
+.movie-card.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+}
+
+.movie-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    height: 40px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.movie-poster {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* 星星评分样式 */
+.rating-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.rating-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+/* 替换原来的星星评分样式 */
+/* 在movie-selection-rating.css中添加 */
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0; /* 移除空格 */
+}
+
+.rating-star {
+    font-size: 28px;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.2s;
+    position: relative;
+    display: inline-block;
+}
+
+.rating-star input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.rating-star .star {
+    display: inline-block;
+    transition: color 0.2s;
+}
+
+.rating-star:hover .star,
+.rating-star:hover ~ .rating-star .star,
+.rating-star input:checked ~ .rating-star .star,
+.rating-star input:checked + .star {
+    color: #ffc107;
+}
+.rating-star .star {
+    display: inline-block;
+}
+
+.rating-value {
+    font-size: 14px;
+    color: #667eea;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.checkbox-wrapper {
+    margin-top: 15px;
+}
+
+.checkbox-input {
+    display: none;
+}
+
+.checkbox-label {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #f0f0f0;
+    color: #666;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.checkbox-input:checked + .checkbox-label {
+    background: #667eea;
+    color: white;
+}
+
+.controls-section {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.batch-controls {
+    margin-bottom: 20px;
+}
+
+.control-button {
+    padding: 12px 30px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.next-batch-button {
+    background: #6c757d;
+    color: white;
+}
+
+.next-batch-button:hover {
+    background: #545b62;
+}
+
+.proceed-button {
+    background: #28a745;
+    color: white;
+    font-size: 18px;
+    padding: 15px 40px;
+}
+
+.proceed-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+.proceed-button.active {
+    background: #218838;
+}
+
+.proceed-button.active:hover {
+    background: #1e7e34;
+    transform: scale(1.05);
+}
+
+.selection-info {
+    margin-top: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #ffc107;
+    border-radius: 6px;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.selection-info p {
+    color: #666;
+    font-size: 16px;
+    margin: 15px 0;
+}
+
+/* 加载模态框 */
+.loading-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.spinner-large {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.modal-content h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.progress-text {
+    font-size: 16px;
+    color: #666;
+    margin: 15px 0;
+}
+
+.progress-container {
+    width: 100%;
+    height: 10px;
+    background: #f0f0f0;
+    border-radius: 5px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.progress-container .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.loading-steps {
+    margin: 30px 0;
+    text-align: left;
+    display: inline-block;
+}
+
+.step {
+    margin: 10px 0;
+    color: #999;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.step.active {
+    color: #667eea;
+    font-weight: 500;
+}
+
+.tip {
+    color: #888;
+    font-size: 14px;
+    margin-top: 20px;
+    font-style: italic;
+}
+
+/* 添加以下样式到movie-selection-rating.css */
+
+.movie-poster-placeholder {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-radius: 6px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.no-movies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    color: #666;
+    font-size: 18px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+/* 优化星星评分样式 */
+.rating-star.selected .star {
+    color: #ffc107;
+}
+
+.rating-star .star {
+    display: block;
+    transition: color 0.2s;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+}
+
+.rating-star:hover .star,
+.rating-star:hover ~ .rating-star .star {
+    color: #ffd700;
+}
+
+/* 新增样式 */
+
+/* 头部操作按钮 */
+.header-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.btn-help, .btn-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: #f8f9fa;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.btn-help:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #6c757d;
+    color: white;
+}
+
+/* 搜索区域增强 */
+.search-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.search-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-tips {
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.tip-link {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.tip-link:hover {
+    text-decoration: underline;
+}
+
+/* 电影卡片增强 */
+.movies-section {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+}
+
+.batch-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.batch-text {
+    color: #6c757d;
+}
+
+.batch-navigation {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-batch-prev, .btn-batch-next {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #dee2e6;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    transition: all 0.3s;
+}
+
+.btn-batch-prev:hover, .btn-batch-next:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.batch-current {
+    font-weight: 600;
+    color: #333;
+}
+
+/* 电影卡片样式增强 */
+.card-header {
+    position: relative;
+}
+
+.movie-poster-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+}
+
+.movie-poster {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.movie-card:hover .movie-poster {
+    transform: scale(1.05);
+}
+
+.movie-poster-placeholder {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+}
+
+.movie-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.btn-info-small {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.btn-info-small:hover {
+    background: #667eea;
+    transform: scale(1.1);
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.movie-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.movie-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.movie-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: #e9ecef;
+    color: #495057;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.movie-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #ffd93d;
+    font-weight: 600;
+}
+
+.rating-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.rating-hint {
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid #dee2e6;
+}
+
+.checkbox-label:hover {
+    background: #e9ecef;
+}
+
+.checkbox-input:checked + .checkbox-label {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* 选择进度区域 */
+.selection-summary {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.progress-container {
+    flex: 1;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.progress-text {
+    color: #333;
+    font-weight: 600;
+}
+
+.progress-count {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffc107, #ffd93d);
+    border-radius: 5px;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.summary-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #495057;
+}
+
+.stat i {
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+.stat strong {
+    color: #333;
+    font-size: 1.2rem;
+}
+
+/* 操作按钮 */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 电影详情模态框 */
+.movie-info-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-size: 1.2rem;
+    z-index: 10;
+    transition: all 0.3s;
+}
+
+.modal-close:hover {
+    background: #667eea;
+    color: white;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 40px;
+}
+
+.movie-info-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.info-header h2 {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+    flex: 1;
+}
+
+.info-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: #ffd93d;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.info-body {
+    display: flex;
+    gap: 30px;
+}
+
+.info-poster {
+    flex-shrink: 0;
+}
+
+.info-poster img {
+    width: 200px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.info-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #495057;
+}
+
+.info-item i {
+    color: #667eea;
+    width: 20px;
+}
+
+.info-actions {
+    display: flex;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-action:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* 高亮动画 */
+.movie-card.highlight {
+    animation: highlightCard 2s ease;
+    box-shadow: 0 0 0 3px #667eea;
+}
+
+@keyframes highlightCard {
+    0%, 100% {
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    50% {
+        box-shadow: 0 0 0 3px #667eea, 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+}
+
+/* 无电影数据样式 */
+.no-movies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.no-movies i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.no-movies h3 {
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.no-movies p {
+    color: #adb5bd;
+    margin-bottom: 25px;
+}
+
+.btn-refresh {
+    display: inline-block;
+    padding: 10px 30px;
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-refresh:hover {
+    background: #764ba2;
+    transform: translateY(-2px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .info-body {
+        flex-direction: column;
+    }
+
+    .info-poster {
+        align-self: center;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-secondary, .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}

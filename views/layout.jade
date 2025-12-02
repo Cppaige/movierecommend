@@ -20,12 +20,12 @@ html(lang="zh-CN")
         nav.main-nav
           ul
             li: a(href='/') 首页
-            li: a(href='/movielibrary') 电影库
             li: a(href='#how-it-works') 使用指南
+            li: a(href='/movielibrary') 电影库
             // 登录后显示我的评分和去评分
             if isLogin
-              li: a(href=`/myratings?userid=${userid}&username=${username}`) 我的评分
-              li: a(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
+              li: a(href=`/myratings`) 我的评分
+              li: a(href=`/select-movies`) 去评分
             // 电影库链接已移到上面，这里可以放其他链接
         // 登录/注册按钮区
         .auth-buttons

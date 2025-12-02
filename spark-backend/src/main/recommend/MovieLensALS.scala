@@ -7,6 +7,7 @@ import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
+import recommend.UpdateProgress
 
 
 object MovieLensALS {
@@ -27,11 +28,15 @@ object MovieLensALS {
 
     // 装载参数二,即用户评分,该评分由评分器生成
     val userid=args(1).toInt;
+    UpdateProgress.set(userid, 5, "初始化 Spark 引擎")
     //删除该用户之前已经存在的电影推荐结果，为本次写入最新的推荐结果做准备
     DeleteFromMySQL.delete(userid)
+    UpdateProgress.set(userid, 10, "清空历史推荐结果")
     //从关系数据库中读取该用户对一些电影的个性化评分数据
     val personalRatingsLines:Array[String]=ReadFromMySQL.read(userid)
+    UpdateProgress.set(userid, 20, "加载用户个性评分")
     val myRatings = loadRatings(personalRatingsLines)
+    UpdateProgress.set(userid, 30, "评分数据处理完毕")
     val myRatingsRDD = spark.sparkContext.parallelize(myRatings, 1)
 
     // 样本数据目录
@@ -44,6 +49,7 @@ object MovieLensALS {
       (fields(3).toLong % 10, Rating(fields(0).toInt, fields(1).toInt,
         fields(2).toDouble))
     }
+    UpdateProgress.set(userid, 40, "加载 MovieLens 大数据集")
 
     //装载电影目录对照表(电影 ID->电影标题)
     //movies.dat 原始数据:电影编号、电影名称、电影类别
@@ -90,6 +96,7 @@ object MovieLensALS {
     var bestLambda = 0.0  //最好的ALS正则化参数
     var bestNumIter = 0  //最好的迭代次数
     for (rank <- ranks; lambda <- lambdas; numIter <- numIters) {
+      UpdateProgress.set(userid, 60, s"训练模型中 rank=$rank iter=$numIter")
       println("正在执行循环训练模型")
       val als = new ALS().setMaxIter(numIter).setRank(rank).setRegParam(lambda).setUserCol("user").setItemCol("product").setRatingCol("rating")
       val model = als.fit(trainingDF)//训练样本、隐语义因子的个数、迭代次数、ALS 的正则化参数
@@ -107,6 +114,7 @@ object MovieLensALS {
 
     // 用最佳模型预测测试集的评分,并计算和实际评分之间的均方根误差
     val testRmse = computeRmse(bestModel.get, testDF, numTest)
+    UpdateProgress.set(userid, 80, "最佳模型已找到，生成推荐中")
     //创建一个基准(Naïve Baseline),并把它和最好的模型进行比较
     val meanRating = trainingDF.union(validationDF).select("rating").rdd.map{case Row(v : Double) => v}.mean
     val baselineRmse = math.sqrt(testDF.select("rating").rdd.map{case Row(v : Double) => v}.map(x => (meanRating - x) * (meanRating - x)).mean)
@@ -126,6 +134,7 @@ object MovieLensALS {
     //把推荐结果写入数据库
     val rddForMySQL=recommendations.map(r=>r.user + "::"+ r.product + "::"+ r.rating+"::" + movies(r.product))
     InsertIntoMySQL.insert(rddForMySQL)
+    UpdateProgress.set(userid, 100, "推荐完成")
     var i = 1
     println("Movies recommended for you(用户 ID:推荐电影 ID:推荐分数:推荐电影名称):")
     recommendations.foreach { r =>

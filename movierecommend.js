@@ -8,6 +8,7 @@
 var  express=require('express');
 var  bodyParser = require('body-parser')
 const spawnSync = require('child_process').spawnSync;
+var session = require('express-session');
 var  app=express();
 var mysql=require('mysql');
 var http = require("http");
@@ -29,13 +30,81 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
+var MySQLStore = require('express-mysql-session')(session);
+
+var sessionStore = new MySQLStore({
+    host: '127.0.0.1',
+    port: 3306,
+    user: 'root',
+    password: '202325330111',
+    database: 'movierecommend'
+});
+
+app.use(session({
+    secret: 'movie-matrix-secret-key-2024',
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true,
+        sameSite: 'lax'   // 避免跳转跨域后 cookie 不带
+    }
+}));
+
+// 添加中间件，使 session 数据在所有模板中可用
+app.use(function(req, res, next) {
+    // 将 session 中的用户信息传递给所有视图
+    res.locals.isLogin = req.session.isLoggedIn || false;
+    res.locals.userid = req.session.userId || '';
+    res.locals.username = req.session.username || '';
+    next();
+});
+
+// 登录检查中间件
+function requireLogin(req, res, next) {
+    if (!req.session.isLoggedIn) {
+        // 可以重定向到登录页面，或者返回错误
+        return res.redirect('/loginpage');
+    }
+    next();
+}
+
 /**
  * 跳转到网站首页
  */
-app.get('/',function (req,res) {
-    res.render('index');
-})
+app.get('/', function (req, res) {
+    // 如果用户已登录，获取他们的评分记录
+    var ratedMovies = [];
 
+    if (req.session.isLoggedIn) {
+        var userId = req.session.userId;
+
+        // 查询用户的评分记录
+        var ratingsSQL = "SELECT movieid FROM personalratings WHERE userid = ? LIMIT 10";
+
+        connection.query(ratingsSQL, [userId], function(err, rows) {
+            if (err) {
+                console.error('查询评分记录错误:', err);
+            } else {
+                ratedMovies = rows.map(row => row.movieid);
+            }
+
+            // 渲染首页
+            res.render('index', {
+                title: 'MovieMatrix - 智能电影推荐',
+                ratedMovies: ratedMovies
+                // isLogin, userid, username 已经在 res.locals 中
+            });
+        });
+    } else {
+        // 未登录用户
+        res.render('index', {
+            title: 'MovieMatrix - 智能电影推荐',
+            ratedMovies: []
+        });
+    }
+});
 /**
  * 跳转到登录页面
  */
@@ -68,7 +137,7 @@ app.post('/login', function (req, res) {
             return res.render('loginpage', {
                 title: '登录',
                 error: '用户不存在，请先注册',
-                showRegisterLink: true  // 可选：用于在前端显示注册链接
+                showRegisterLink: true
             });
         }
 
@@ -80,61 +149,48 @@ app.post('/login', function (req, res) {
             return res.render('loginpage', {
                 title: '登录',
                 error: '密码错误，请重新输入',
-                username: name  // 保留用户名，方便用户重新输入
+                username: name
             });
         }
 
-        // 情况3：登录成功，获取电影数据
-        var selectMovieInfoSQL = "SELECT movieid, moviename, picture FROM movieinfo LIMIT 1000";
-        var movieinfolist = [];
+        // 情况3：登录成功
+        req.session.isLoggedIn = true;
+        req.session.userId = user.userid;
+        req.session.username = user.username;
 
-        connection.query(selectMovieInfoSQL, function (err, rows, fields) {
-            if (err) {
-                console.error('获取电影信息错误:', err);
-                // 即使获取电影失败也允许登录，只是没有推荐电影
-                movieinfolist = [];
-            } else {
-                movieinfolist = rows;
-            }
-
-            function randomFrom(lowerValue, upperValue) {
-                return Math.floor(Math.random() * (upperValue - lowerValue + 1) + lowerValue);
-            }
-
-            var lowerValue = 0;
-            var upperValue = movieinfolist.length - 1;  // 注意：应该是length-1
-            var movielist = [];
-            var movieNumbers = 10;
-
-            // 安全检查：如果电影列表为空或数量不足，调整数量
-            if (movieinfolist.length === 0) {
-                movieNumbers = 0;
-            } else if (movieinfolist.length < movieNumbers) {
-                movieNumbers = movieinfolist.length;
-            }
-
-            for (var i = 0; i < movieNumbers; i++) {
-                var index = randomFrom(lowerValue, upperValue);
-                // 安全检查：确保索引在有效范围内
-                if (movieinfolist[index]) {
-                    movielist.push({
-                        movieid: movieinfolist[index].movieid,
-                        moviename: movieinfolist[index].moviename,
-                        picture: movieinfolist[index].picture
-                    });
-                }
-            }
-
-            // 登录成功
-            res.render('index', {
-                title: 'MovieMatrix - 智能电影推荐',
-                isLogin: true,
-                userid: user.userid,
-                username: user.username,
-                recommendedMovies: movielist,  // 改为recommendedMovies更合适
-                ratedMovies: []
-            });
+        console.log('用户登录成功，设置session:', {
+            userId: user.userid,
+            username: user.username
         });
+
+        // 保存 session
+        req.session.save(function(err) {
+            if (err) {
+                console.error('保存session失败:', err);
+                return res.render('loginpage', {
+                    title: '登录',
+                    error: '登录失败，请重试'
+                });
+            }
+
+            console.log('session保存成功，重定向到首页');
+            // 重定向到首页
+            res.redirect('/');
+        });
+    });
+});
+
+/**
+ * 退出登录
+ */
+app.get('/logout', function(req, res) {
+    // 销毁 session
+    req.session.destroy(function(err) {
+        if (err) {
+            console.error('退出登录失败:', err);
+        }
+        // 重定向到首页
+        res.redirect('/');
     });
 });
 
@@ -189,50 +245,132 @@ app.post('/register', function (req, res) {
         });
     });
 });
+
 /**
  * 跳转到电影选择页面
  */
 app.get('/select-movies', function (req, res) {
-    var userid = req.query.userid;
-    var username = req.query.username;
+    // 重定向到合并页面
+    res.redirect('/movie-selection-rating');
+});
+// 2. 添加新的合并页面路由
+app.get('/movie-selection-rating', function(req, res) {
+    // 获取用户信息
+    var userid = req.session.userId;
+    var username = req.session.username;
 
-    // 从数据库获取所有电影
-    var selectAllMoviesSQL = "select movieid, moviename, picture from movieinfo limit 200"; // 限制数量避免过多
+    // 获取电影数据（分批次显示）
+    connection.query(
+        "SELECT movieid, moviename, picture FROM movieinfo ORDER BY RAND() LIMIT 100",
+        function(error, results, fields) {
+            if (error) {
+                console.log("查询电影失败: " + error);
+                res.status(500).send("服务器错误");
+                return;
+            }
 
-    connection.query(selectAllMoviesSQL, function(err, rows, fields) {
-        if (err) throw err;
+            // 将电影分成5批，每批20部
+            var batches = [];
+            var batchSize = 20;
+            for (var i = 0; i < results.length; i += batchSize) {
+                batches.push(results.slice(i, i + batchSize));
+            }
 
-        // 将电影分成批次，每批10部
-        var batchSize = 10;
-        var movieBatches = [];
-        for (var i = 0; i < rows.length; i += batchSize) {
-            movieBatches.push(rows.slice(i, i + batchSize));
+            res.render('movie-selection-rating', {
+                username: username,
+                userid: userid,
+                minSelectionRequired: 5, // 最少选择5部
+                currentBatchIndex: 0,
+                totalBatches: batches.length,
+                movieBatches: batches
+            });
         }
+    );
+});
+// 3. 添加新的提交和推荐路由
+app.post('/submit-and-recommend', function(req, res) {
+    var userid = req.body.userid;
+    var selectedData = req.body.selectedData; // 格式: "movieId:rating,movieId:rating"
 
-        var currentBatchIndex = 0;
-        var totalBatches = movieBatches.length;
-        var minSelectionRequired = 5; // 至少选择5部电影
+    console.log("收到评分数据:", selectedData);
 
-        res.render('movie-selection', {
-            title: '选择看过的电影',
-            username: username,
-            userid: userid,
-            movieBatches: movieBatches,
-            currentBatchIndex: currentBatchIndex,
-            totalBatches: totalBatches,
-            minSelectionRequired: minSelectionRequired
-        });
-    });
+    // 1. 清空该用户的历史评分
+    connection.query(
+        "DELETE FROM personalratings WHERE userid = ?",
+        [userid],
+        function(error, results, fields) {
+            if (error) {
+                console.log("删除历史评分失败: " + error);
+                res.status(500).json({error: "删除历史评分失败"});
+                return;
+            }
+
+            console.log("用户 " + userid + " 的历史评分已删除");
+
+            // 2. 插入新的评分
+            var ratings = selectedData.split(',');
+            var insertedCount = 0;
+            var errors = [];
+
+            ratings.forEach(ratingData => {
+                var parts = ratingData.split(':');
+                if (parts.length === 2) {
+                    var movieid = parseInt(parts[0]);
+                    var rating = parseInt(parts[1]);
+
+                    if (movieid && rating >= 1 && rating <= 5) {
+                        connection.query(
+                            "INSERT INTO personalratings SET ?",
+                            {
+                                userid: userid,
+                                movieid: movieid,
+                                rating: rating,
+                                timestamp: Math.floor(Date.now() / 1000)
+                            },
+                            function(error, results, fields) {
+                                if (error) {
+                                    console.log("插入评分失败: " + error);
+                                    errors.push(error);
+                                } else {
+                                    insertedCount++;
+                                    console.log("插入评分成功: movieid=" + movieid + ", rating=" + rating);
+                                }
+                            }
+                        );
+                    }
+                }
+            });
+
+            // 延迟响应，等待数据库操作完成
+            setTimeout(() => {
+                console.log("成功插入 " + insertedCount + " 条评分记录");
+
+                // 3. 直接跳转到推荐结果页面（会触发Spark任务）
+                res.json({
+                    redirectUrl: `/recommendmovieforuser?userid=${userid}&username=${req.session.username}`
+                });
+            }, 1000);
+        }
+    );
 });
 
 /**
  * 处理选择的电影并跳转到评分页面
  */
 app.post('/rate-movies', function (req, res) {
-    var userid = req.body.userid;
-    var selectedMovieIds = req.body.selectedMovieIds;
+    // 检查是否登录
+    if (!req.session.isLoggedIn) {
+        return res.redirect('/loginpage');
+    }
+
+    var userid = req.session.userId;
+    var username = req.session.username;
+
+    // 这里获取 selectedMovieIds
+    var selectedMovieIds = req.body.selectedMovieIds || '';
 
     console.log('Selected movie IDs:', selectedMovieIds);
+
 
     // 如果selectedMovieIds是空字符串，转换为空数组
     var movieIdArray = selectedMovieIds ? selectedMovieIds.split(',').filter(function(id) {
@@ -269,15 +407,13 @@ app.post('/rate-movies', function (req, res) {
 
 app.post('/submituserscore', function (req, res) {
     console.log('=== 收到评分请求 ===');
-    console.log('完整请求体:', JSON.stringify(req.body, null, 2));
 
-    // 检查请求体
-    if (!req.body) {
-        console.error('错误: req.body 为 undefined');
-        return res.status(400).json({ error: '请求体为空' });
+    // 检查是否登录
+    if (!req.session.isLoggedIn) {
+        return res.status(401).json({ error: '请先登录' });
     }
 
-    var userid = req.body.userid;
+    var userid = req.session.userId;  // 从 session 获取
 
     // 检查必要参数
     if (!userid) {
@@ -364,21 +500,25 @@ app.post('/submituserscore', function (req, res) {
                 timestamp: mytimestamp
             };
 
-            connection.query('INSERT INTO personalratings SET ?', personalratings, function (err, rs) {
-                if (err) {
-                    console.error('插入评分失败:', err);
-                } else {
-                    console.log('插入评分成功');
+            var query = connection.query(
+                "INSERT INTO personalratings SET ?",
+                {
+                    userid: parseInt(userid),
+                    movieid: parseInt(movieid), // 确保转换为整数
+                    rating: parseInt(rating),
+                    timestamp: parseInt(timestamp)
+                },
+                function(error, results, fields) {
+                    if (error) {
+                        console.log("插入评分失败: " + error);
+                    } else {
+                        console.log("评分插入成功");
+                    }
                 }
-
-                completedInserts++;
-                // 当所有插入操作完成时
-                if (completedInserts === totalInserts) {
-                    handleSuccessResponse();
-                }
-            });
+            );
         }
     });
+
 
     function handleSuccessResponse() {
         var selectUserIdNameSQL = 'SELECT userid, username FROM user WHERE userid = ?';
@@ -404,8 +544,12 @@ app.post('/submituserscore', function (req, res) {
  * 为用户显示推荐结果（直接从数据库读取）
  */
 app.get('/recommendmovieforuser', function (req, res) {
-    const userid = req.query.userid;
-    const username = req.query.username;
+    if (!req.session.isLoggedIn) {
+        return res.redirect('/loginpage');
+    }
+
+    const userid = req.session.userId;
+    const username = req.session.username;
 
     console.log('为用户 ' + userid + ' 显示推荐结果...');
 
@@ -524,10 +668,8 @@ app.get('/movielibrary', function (req, res) {
                 totalMovies: totalMovies,
                 sortBy: sortBy,
                 order: orderBy,
-                nextOrder: orderBy === 'DESC' ? 'asc' : 'desc',
-                // 用户登录状态（如果有的话）
-                isLogin: req.session ? req.session.isLoggedIn : false,
-                username: req.session ? req.session.username : null
+                nextOrder: orderBy === 'DESC' ? 'asc' : 'desc'
+                // 不再需要传递 isLogin, username
             });
         });
     });
@@ -584,24 +726,27 @@ app.get('/movie/:id', function (req, res) {
         res.render('moviedetail', {
             title: formattedMovie.title + ' - MovieMatrix',
             movie: formattedMovie,
-            isLogin: req.session ? req.session.isLoggedIn : false,
-            username: req.session ? req.session.username : null
         });
     });
 });
 
 /**
- * 我的评分页面
+ * 我的评分页面 - 修改版
  */
 app.get('/myratings', function (req, res) {
-    // 从查询参数获取用户信息
-    var userId = req.query.userid;
-    var username = req.query.username;
+    console.log('=== 进入 /myratings 路由 ===');
 
-    // 如果没有用户ID，重定向到登录页面
-    if (!userId) {
+    // 检查是否登录
+    if (!req.session.isLoggedIn) {
+        console.log('用户未登录，重定向到登录页面');
         return res.redirect('/loginpage');
     }
+
+    // 从 session 获取用户信息
+    var userId = req.session.userId;
+    var username = req.session.username;
+
+    console.log('从session获取用户信息 - ID:', userId, '用户名:', username);
 
     // 查询用户的评分记录
     var ratingsSQL = `
@@ -625,12 +770,26 @@ app.get('/myratings', function (req, res) {
     connection.query(ratingsSQL, [userId], function (err, ratings) {
         if (err) {
             console.error('查询评分记录错误:', err);
+            // 返回一个简单的错误页面
             return res.render('error', {
-                title: '错误',
-                message: '获取评分记录失败',
-                isLogin: true,
-                userid: userId,
-                username: username
+                title: '数据库错误',
+                message: '获取评分记录失败: ' + err.message,
+            });
+        }
+
+        console.log('查询到评分记录:', ratings.length, '条');
+
+        // 如果没有任何评分记录
+        if (ratings.length === 0) {
+            return res.render('myratings', {
+                title: '我的评分 - MovieMatrix',
+                username: username || '用户',
+                ratings: [],
+                stats: {
+                    totalRatings: 0,
+                    avgMyRating: '0.0',
+                    ratingDistribution: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+                },
             });
         }
 
@@ -646,9 +805,9 @@ app.get('/myratings', function (req, res) {
                 genres: item.typelist ? item.typelist.split(',').slice(0, 3) : [],
                 releaseYear: item.releasetime ?
                     new Date(item.releasetime).getFullYear() : '未知',
-                director: item.director,
+                director: item.director || '未知',
                 timestamp: item.timestamp,
-                formattedDate: formatDate(item.timestamp)
+                formattedDate: item.timestamp || '未知时间'
             };
         });
 
@@ -657,17 +816,20 @@ app.get('/myratings', function (req, res) {
             totalRatings: formattedRatings.length,
             avgMyRating: formattedRatings.length > 0 ?
                 (formattedRatings.reduce((sum, item) => sum + item.myRating, 0) / formattedRatings.length).toFixed(1) : '0.0',
-            ratingDistribution: getRatingDistribution(formattedRatings)
+            ratingDistribution: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
     };
+
+        formattedRatings.forEach(item => {
+            if (item.myRating >= 1 && item.myRating <= 5) {
+            stats.ratingDistribution[item.myRating]++;
+        }
+    });
 
         res.render('myratings', {
             title: '我的评分 - MovieMatrix',
             username: username,
             ratings: formattedRatings,
-            stats: stats,
-            isLogin: true,
-            userid: userId,
-            username: username
+            stats: stats
         });
     });
 });
@@ -709,30 +871,6 @@ function getRatingDistribution(ratings) {
     return distribution;
 }
 
-/**
- * 删除评分记录
- */
-app.post('/myratings/delete', function (req, res) {
-    var userId = req.body.userid;
-    var movieId = req.body.movieid;
-    var username = req.body.username;
-
-    if (!userId || !movieId) {
-        return res.json({success: false, message: '参数不完整'});
-    }
-
-    var deleteSQL = "DELETE FROM personalratings WHERE userid = ? AND movieid = ?";
-
-    connection.query(deleteSQL, [userId, movieId], function (err, result) {
-        if (err) {
-            console.error('删除评分记录错误:', err);
-            return res.json({success: false, message: '删除失败'});
-        }
-
-        // 重定向回我的评分页面
-        res.redirect(`/myratings?userid=${userId}&username=${encodeURIComponent(username)}`);
-    });
-});
 
 // support local visit
 var server = app.listen(3000, '0.0.0.0', function () {
@@ -741,4 +879,60 @@ var server = app.listen(3000, '0.0.0.0', function () {
     console.log("movierecommend server start......");
     console.log("本地访问: http://localhost:%s", port);
     console.log("网络访问: http://%s:%s", host === '::' ? '0.0.0.0' : host, port);
+});
+
+app.get('/recommendprogress', (req, res) => {
+    const userid = req.query.userid;
+
+    const sql = "SELECT progress, step FROM recommendprogress WHERE userid = ?";
+
+    connection.query(sql, [userid], (err, rows) => {
+        if (err || rows.length === 0) {
+            return res.json({
+                status: "running",
+                progress: 0,
+                message: "初始化 Spark 推荐引擎..."
+            });
+        }
+
+        const row = rows[0];
+        res.json({
+            status: row.progress >= 100 ? "completed" : "running",
+            progress: row.progress,
+            message: row.step
+        });
+    });
+});
+
+const { spawn } = require("child_process");
+
+app.post('/startrecommend', (req, res) => {
+    if (!req.session.isLoggedIn) {
+        return res.status(403).json({ error: "请先登录" });
+    }
+
+    const userid = req.session.userId;
+
+    // Spark 必须用绝对路径
+    const sparkPath = "/usr/local/spark/bin/spark-submit";
+
+    // ALS Jar 路径（绝对路径）
+    const jarPath = "/home/hadoop/movierecommendapp/spark-backend/out/artifacts/Film_Recommend_Dataframe_jar/Film_Recommend_Dataframe.jar";
+
+    // HDFS 数据路径（你之前给我的是这个）
+    const dataPath = "/input_spark";
+
+    console.log("启动 Spark 推荐任务", userid);
+
+    const spark = spawn(sparkPath, [
+        "--class", "recommend.MovieLensALS",
+        jarPath,
+        dataPath,
+        userid
+    ]);
+
+    spark.stdout.on("data", d => console.log("Spark:", d.toString()));
+    spark.stderr.on("data", d => console.error("Spark ERROR:", d.toString()));
+
+    res.json({ status: "started" });
 });
