@@ -1,0 +1,92 @@
+doctype html
+html(lang="zh-CN")
+  head
+    title= title || 'MovieMatrix - 智能电影推荐'
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/css/index.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    block extraCSS  // 允许子页面添加额外的CSS
+
+  body
+    // 导航栏（黑色底色适配）- 这是所有页面共享的部分
+    header#header
+      .nav-container
+        // Logo（点击返回主页）
+        a.logo(href='/')
+          i.fas.fa-film
+          span MovieMatrix
+        // 导航菜单
+        nav.main-nav
+          ul
+            li: a(href='/') 首页
+            li: a(href='/movielibrary') 电影库
+            li: a(href='#how-it-works') 使用指南
+            // 登录后显示我的评分和去评分
+            if isLogin
+              li: a(href=`/myratings?userid=${userid}&username=${username}`) 我的评分
+              li: a(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
+            // 电影库链接已移到上面，这里可以放其他链接
+        // 登录/注册按钮区
+        .auth-buttons
+          if isLogin
+            .user-info
+              span.welcome 欢迎，#{username}
+              a.btn.btn-logout(href='/logout') 退出
+          else
+            a.btn.btn-login(href='/loginpage') 登录
+            a.btn.btn-signup(href='/registerpage') 注册
+
+    // 主要内容区域 - 这是子页面插入自己内容的地方
+    main#main-content
+      block content
+
+    // 页脚（居中，黑色底色）- 所有页面共享
+    footer
+      .footer-container
+        .logo
+          i.fas.fa-film
+          span MovieMatrix
+        .links
+          a(href='#') 关于我们
+          a(href='#') 帮助中心
+          a(href='#') 隐私政策
+          a(href='#') 联系我们
+        p.copyright &copy; 2024 MovieMatrix. 保留所有权利.
+
+    // 评分弹窗（如果需要的话）
+    .modal#rate-modal(style="display: none;")
+      .modal-inner
+        .modal-close
+          i.fas.fa-times
+        .modal-body
+          .movie-poster
+            img(src='', alt='电影海报')
+          .movie-info
+            h3#modal-title 电影名称
+            p#modal-genre 类型
+          .stars
+            i.fas.fa-star
+            i.fas.fa-star
+            i.fas.fa-star
+            i.fas.fa-star
+            i.fas.fa-star
+          .hint 选择1-5星评分
+        .modal-footer
+          button.btn-cancel 取消
+          button.btn-submit 提交
+
+    // 公共JS脚本
+    script(src='/js/common.js')
+
+    // 暴露后端状态给JS
+    script.
+      window.appState = {
+        isLogin: !{JSON.stringify(isLogin || false)},
+        userId: !{JSON.stringify(userid || '')},
+        userName: !{JSON.stringify(username || '')},
+        ratedMovies: !{JSON.stringify(ratedMovies || [])}
+      };
+
+    // 允许子页面添加额外的JS
+    block extraJS
