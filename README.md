@@ -1,6 +1,13 @@
 # movierecommend
 *已经解决的问题可以标注某某人已解决*
 
+## 问题 & 解决
+1. 数据库显示中文问题
+   > show create table movieinfo;
+   检查 CHARSET=utf8mb4,如果不是,执行:
+   > ALTER TABLE movieinfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
 ### TO DO LIST 必须解决
 1. **修改数据库**（可以直接改电影库，换一个数据集，或者修复图片问题，图片是一个外链，外链的网站打不开）== *重要！！* 辣椒油已解决
 2. 主页个性化推荐无法跳转到推荐界面，推荐界面也没办法回到主页。
