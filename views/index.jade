@@ -1,217 +1,153 @@
-doctype html
-html(lang="zh-CN")
-  head
-    title MovieMatrix - 智能电影推荐
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    link(rel='stylesheet', href='/css/index.css')
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
-  body
-    // 导航栏（黑色底色适配）
-    header#header
-      .nav-container
-        // Logo（点击返回主页）
-        a.logo(href='/')
+extends layout
+
+block content
+  // 焦点轮播区（竖版海报+电影介绍，黑色底色）
+  section#hero.hero
+    .hero-container
+      // 竖版海报轮播
+      .carousel
+        .carousel-track
+          .carousel-item
+            img(src='https://media.themoviedb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', alt='Interstellar')
+          .carousel-item
+            img(src='https://media.themoviedb.org/t/p/w500/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg', alt='Inception')
+          .carousel-item
+            img(src='https://media.themoviedb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg', alt='Forrest Gump')
+        // 轮播控制按钮
+        .carousel-control.prev
+          i.fas.fa-chevron-left
+
+        .carousel-control.next
+          i.fas.fa-chevron-right
+
+        // 轮播指示器
+        .carousel-indicators
+          span(data-index='0')
+          span(data-index='1')
+          span(data-index='2')
+      // 电影介绍（随轮播切换）
+      .movie-intro
+        .intro-content
+          h2 星际穿越
+          p 跨越时空的宇宙冒险，为了人类存续的终极探索，在黑洞边缘书写爱的传奇。
+        .intro-content
+          h2 盗梦空间
+          p 多层梦境交织的烧脑谜题，现实与虚幻的边界逐渐模糊，一场关于救赎的博弈。
+        .intro-content
+          h2 阿甘正传
+          p 平凡人生的不凡旅程，用执着与善良诠释生命的真谛，见证时代的变迁。
+
+  // 使用指南区（黑色底色适配）
+  section#how-it-works.how-it-works
+    .section-head
+      h2 找到你的口味电影
+      p 三步解锁专属片单，精准匹配你的观影喜好
+    .steps-container
+      .step
+        .step-icon 1
+        .step-content
+          h3 登录注册
+          p 创建账号或登录，开启个性化推荐之旅
+      .step
+        .step-icon 2
+        .step-content
+          h3 评分电影
+          p 为看过的电影打分，让系统读懂你的口味
+      .step
+        .step-icon 3
+        .step-content
+          h3 获得推荐
+          p 基于你的评分，生成专属个性化片单
+
+  // 评分入口区（黑色底色）
+  section#rating-entry.rating-entry
+    .entry-container
+      h2 准备好找到你可能喜欢的电影了吗？
+      p 为电影评分，解锁更精准的推荐
+      if isLogin
+        a.btn.btn-cta(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
+      else
+        a.btn.btn-cta(href='/loginpage') 登录后评分
+      .tip 登录后可保存评分记录，持续优化推荐结果
+
+  // 个性化推荐区（上移）
+  section#recommend.recommend
+    .section-head
+      h2 个性化推荐
+      if !isLogin
+        .login-tip
+          span 登录后解锁
+          a.btn-login-small(href='/loginpage') 去登录
+    .movies-grid#recommend-grid
+      if isLogin && ratedMovies.length > 0
+        // 登录且有评分时显示推荐（由JS渲染）
+        each movie in recommendedMovies || []
+          .movie-card
+            .card-top
+              img(src=movie.picture, alt=movie.moviename)
+              .rate-btn
+                i.fas.fa-star
+            .card-bottom
+              h3= movie.moviename
+              .meta
+                span= movie.typelist || '类型未知'
+                span= movie.averating || '0.0'
+      else if isLogin
+        .empty-state
+          i.fas.fa-star
+          p 去电影库评分，获取专属推荐
+      else
+        .empty-state
           i.fas.fa-film
-          span MovieMatrix
-        // 导航菜单
-        nav.main-nav
-          ul
-            li: a.active(href='#hero') 首页
-            li: a(href='#how-it-works') 使用指南
-            li: a(href='#recommend') 推荐
-            li: a(href='#library') 电影库
-            // 登录后显示我的评分和去评分
-            if isLogin
-              li: a(href=`/personalratings?userid=${userid}&username=${username}`) 我的评分
-              li: a(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
-        // 登录/注册按钮区
-        .auth-buttons
-          if isLogin
-            .user-info
-              span= username
-              a(href='/', class='btn btn-logout') 退出
-          else
-            button.btn.btn-login(onclick="window.location.href='/loginpage'") 登录
-            button.btn.btn-signup(onclick="window.location.href='/registerpage'") 注册
+          p 登录后显示个性化推荐
 
-    // 焦点轮播区（竖版海报+电影介绍，黑色底色）
-    section#hero.hero
-      .hero-container
-        // 竖版海报轮播
-        .carousel
-          .carousel-track
-            .carousel-item
-              img(src='https://media.themoviedb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', alt='Interstellar')
-            .carousel-item
-              img(src='https://media.themoviedb.org/t/p/w500/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg', alt='Inception')
-            .carousel-item
-              img(src='https://media.themoviedb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg', alt='Forrest Gump')
-          // 轮播控制按钮
-          .carousel-control.prev
-            i.fas.fa-chevron-left
-
-          .carousel-control.next
-            i.fas.fa-chevron-right
-
-          // 轮播指示器
-          .carousel-indicators
-            span(data-index='0')
-            span(data-index='1')
-            span(data-index='2')
-        // 电影介绍（随轮播切换）
-        .movie-intro
-          .intro-content
-            h2 星际穿越
-            p 跨越时空的宇宙冒险，为了人类存续的终极探索，在黑洞边缘书写爱的传奇。
-          .intro-content
-            h2 盗梦空间
-            p 多层梦境交织的烧脑谜题，现实与虚幻的边界逐渐模糊，一场关于救赎的博弈。
-          .intro-content
-            h2 阿甘正传
-            p 平凡人生的不凡旅程，用执着与善良诠释生命的真谛，见证时代的变迁。
-
-    // 使用指南区（黑色底色适配）
-    section#how-it-works.how-it-works
-      .section-head
-        h2 找到你的口味电影
-        p 三步解锁专属片单，精准匹配你的观影喜好
-      .steps-container
-        .step
-          .step-icon 1
-          .step-content
-            h3 登录注册
-            p 创建账号或登录，开启个性化推荐之旅
-        .step
-          .step-icon 2
-          .step-content
-            h3 评分电影
-            p 为看过的电影打分，让系统读懂你的口味
-        .step
-          .step-icon 3
-          .step-content
-            h3 获得推荐
-            p 基于你的评分，生成专属个性化片单
-
-    // 评分入口区（黑色底色）
-    section#rating-entry.rating-entry
-      .entry-container
-        h2 准备好找到你可能喜欢的电影了吗？
-        p 为电影评分，解锁更精准的推荐
-        if isLogin
-          a.btn.btn-cta(href=`/select-movies?userid=${userid}&username=${username}`) 去评分
-        else
-          button.btn.btn-cta(onclick="window.location.href='/loginpage'") 登录后评分
-        .tip 登录后可保存评分记录，持续优化推荐结果
-
-    // 个性化推荐区（上移）
-    section#recommend.recommend
-      .section-head
-        h2 个性化推荐
-        if !isLogin
-          .login-tip
-            span 登录后解锁
-            button.btn-login-small(onclick="window.location.href='/loginpage'") 去登录
-      .movies-grid#recommend-grid
-        if isLogin && ratedMovies.length > 0
-          // 登录且有评分时显示推荐（由JS渲染）
-        else if isLogin
-          .empty-state
+  // 电影库（下移到推荐区下面）
+  section#library.library
+    .section-head
+      h2 热门电影
+      a.view-all(href='/movielibrary') 查看全部
+    .movies-grid
+      .movie-card
+        .card-top
+          img(src='https://media.themoviedb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', alt='Dune')
+          .rate-btn
             i.fas.fa-star
-            p 去电影库评分，获取专属推荐
-        else
-          .empty-state
-            i.fas.fa-film
-            p 登录后显示个性化推荐
+        .card-bottom
+          h3 沙丘
+          .meta
+            span 科幻/冒险
+            span 8.0
+      .movie-card
+        .card-top
+          img(src='https://media.themoviedb.org/t/p/w500/u68AjlvlutfEIcpmbYpKcdi09ut.jpg', alt='Everything Everywhere All at Once')
+          .rate-btn
+            i.fas.fa-star
+        .card-bottom
+          h3 瞬息全宇宙
+          .meta
+            span 奇幻/喜剧
+            span 7.8
+      .movie-card
+        .card-top
+          img(src='https://media.themoviedb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', alt='Oppenheimer')
+          .rate-btn
+            i.fas.fa-star
+        .card-bottom
+          h3 奥本海默
+          .meta
+            span 传记/历史
+            span 8.6
+      .movie-card
+        .card-top
+          img(src='https://media.themoviedb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg', alt='Barbie')
+          .rate-btn
+            i.fas.fa-star
+        .card-bottom
+          h3 芭比
+          .meta
+            span 喜剧/奇幻
+            span 7.0
 
-    // 电影库（下移到推荐区下面）
-    section#library.library
-      .section-head
-        h2 热门电影
-        a.view-all(href='#') 查看全部
-      .movies-grid
-        .movie-card
-          .card-top
-            img(src='https://media.themoviedb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', alt='Dune')
-            .rate-btn
-              i.fas.fa-star
-          .card-bottom
-            h3 沙丘
-            .meta
-              span 科幻/冒险
-              span 8.0
-        .movie-card
-          .card-top
-            img(src='https://media.themoviedb.org/t/p/w500/u68AjlvlutfEIcpmbYpKcdi09ut.jpg', alt='Everything Everywhere All at Once')
-            .rate-btn
-              i.fas.fa-star
-          .card-bottom
-            h3 瞬息全宇宙
-            .meta
-              span 奇幻/喜剧
-              span 7.8
-        .movie-card
-          .card-top
-            img(src='https://media.themoviedb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', alt='Oppenheimer')
-            .rate-btn
-              i.fas.fa-star
-          .card-bottom
-            h3 奥本海默
-            .meta
-              span 传记/历史
-              span 8.6
-        .movie-card
-          .card-top
-            img(src='https://media.themoviedb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg', alt='Barbie')
-            .rate-btn
-              i.fas.fa-star
-          .card-bottom
-            h3 芭比
-            .meta
-              span 喜剧/奇幻
-              span 7.0
-
-    // 评分弹窗
-    .modal#rate-modal
-      .modal-inner
-        .modal-close
-          i.fas.fa-times
-        .modal-body
-          .movie-poster
-            img(src='', alt='电影海报')
-          .movie-info
-            h3#modal-title 电影名称
-            p#modal-genre 类型
-          .stars
-            i.fas.fa-star
-            i.fas.fa-star
-            i.fas.fa-star
-            i.fas.fa-star
-            i.fas.fa-star
-          .hint 选择1-5星评分
-        .modal-footer
-          button.btn-cancel 取消
-          button.btn-submit 提交
-
-    // 页脚（居中，黑色底色）
-    footer
-      .footer-container
-        .logo
-          i.fas.fa-film
-          span MovieMatrix
-        .links
-          a(href='#') 关于我们
-          a(href='#') 帮助中心
-          a(href='#') 隐私政策
-          a(href='#') 联系我们
-        p.copyright &copy; 2024 MovieMatrix. 保留所有权利.
-
-    // 暴露后端状态给JS
-    script.
-      window.appState = {
-        isLogin: !{JSON.stringify(isLogin)},
-        userId: !{JSON.stringify(userid)},
-        userName: !{JSON.stringify(username)},
-        ratedMovies: !{JSON.stringify(ratedMovies || [])}
-      };
-    script(src='/js/index.js')
+// 主页特有的JS
+block extraJS
+  script(src='/js/index.js')

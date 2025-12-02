@@ -1,0 +1,463 @@
+extends layout
+
+block extraCSS
+  style.
+    .myratings-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .page-header .welcome {
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+
+    .stats-section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      color: #007bff;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    .rating-distribution {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    .rating-bar {
+      width: 16%;
+      text-align: center;
+    }
+
+    .rating-star {
+      color: #ffc107;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+
+    .rating-count {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .ratings-list {
+      margin-top: 30px;
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .list-header h2 {
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    .sort-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .sort-btn {
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .sort-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sort-btn.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+
+    .rating-item {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+
+    .rating-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(5px);
+    }
+
+    .movie-poster {
+      width: 100px;
+      height: 150px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .movie-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .movie-info {
+      flex-grow: 1;
+    }
+
+    .movie-title {
+      color: #fff;
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .movie-title a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .movie-title a:hover {
+      color: #007bff;
+    }
+
+    .movie-meta {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .movie-meta span {
+      margin-right: 15px;
+    }
+
+    .genres {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .genre-tag {
+      background: rgba(0, 123, 255, 0.2);
+      color: #4da3ff;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .rating-info {
+      text-align: center;
+      min-width: 120px;
+    }
+
+    .my-rating {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .rating-stars {
+      color: #ffc107;
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+
+    .rating-value {
+      color: #fff;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .rating-label {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    .rating-date {
+      color: #777;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .rating-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .btn-action {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-edit {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+
+    .btn-edit:hover {
+      background: rgba(255, 193, 7, 0.3);
+    }
+
+    .btn-delete {
+      background: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+    }
+
+    .btn-delete:hover {
+      background: rgba(220, 53, 69, 0.3);
+    }
+
+    .no-ratings {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+    }
+
+    .no-ratings i {
+      font-size: 4rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .no-ratings p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .average-rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #ffc107;
+      font-size: 0.9rem;
+    }
+
+    .average-rating i {
+      color: #ffc107;
+    }
+
+    @media (max-width: 768px) {
+      .rating-item {
+        grid-template-columns: 80px 1fr;
+      }
+
+      .rating-info {
+        grid-column: 1 / 3;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .my-rating {
+        flex-direction: row;
+        gap: 10px;
+      }
+
+      .rating-actions {
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .rating-item {
+        grid-template-columns: 1fr;
+      }
+
+      .movie-poster {
+        width: 100%;
+        height: 200px;
+        margin-bottom: 15px;
+      }
+
+      .rating-info {
+        grid-column: 1;
+      }
+    }
+
+block content
+  .myratings-container
+    // 页面头部
+    .page-header
+      h1 我的评分记录
+      p.welcome 欢迎，#{username}！这是你的观影足迹
+
+    // 统计数据
+    .stats-section
+      .stat-card
+        .stat-value #{stats.totalRatings}
+        .stat-label 总评分数量
+      .stat-card
+        .stat-value #{stats.avgMyRating}
+        .stat-label 平均评分
+      .stat-card
+        .stat-label 评分分布
+        .rating-distribution
+          each count, rating in stats.ratingDistribution
+            .rating-bar
+              .rating-star #{rating}★
+              .rating-count #{count}
+
+    // 评分列表
+    .ratings-list
+      .list-header
+        h2 评分历史（按时间倒序）
+        .sort-controls
+          a.sort-btn.active(href="#") 最新
+          a.sort-btn(href="#") 评分最高
+          a.sort-btn(href="#") 评分最低
+
+      if ratings && ratings.length > 0
+        each rating in ratings
+          .rating-item(data-movie-id=rating.movieId, data-rating=rating.myRating)
+            .movie-poster
+              a(href=`/movie/${rating.movieId}`)
+                img(src=rating.poster, alt=rating.movieName, onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'")
+
+            .movie-info
+              .movie-title
+                a(href=`/movie/${rating.movieId}`) #{rating.movieName}
+                .average-rating(title="平均评分")
+                  i.fas.fa-star
+                  span #{rating.averageRating}
+
+              .movie-meta
+                span #{rating.releaseYear}
+                if rating.director
+                  span 导演：#{rating.director}
+                span 评分人数：#{rating.ratingCount.toLocaleString()}
+
+              if rating.genres.length > 0
+                .genres
+                  each genre in rating.genres
+                    span.genre-tag #{genre}
+
+            .rating-info
+              .my-rating
+                .rating-stars
+                  - for (var i = 0; i < 5; i++)
+                    if i < rating.myRating
+                      i.fas.fa-star
+                    else
+                      i.far.fa-star
+                .rating-value #{rating.myRating}.0
+                .rating-label 我的评分
+
+              .rating-date
+                i.far.fa-calendar
+                span  #{rating.formattedDate}
+
+              .rating-actions
+                button.btn-action.btn-edit(type="button", onclick=`editRating(${rating.movieId}, ${rating.myRating})`) 修改
+                form(method="POST", action="/myratings/delete", style="display: inline;")
+                  input(type="hidden", name="userid", value=userid)
+                  input(type="hidden", name="movieid", value=rating.movieId)
+                  input(type="hidden", name="username", value=username)
+                  button.btn-action.btn-delete(type="button", onclick="confirmDelete(this)") 删除
+      else
+        .no-ratings
+          i.far.fa-star
+          p 你还没有为任何电影评分
+          p 快去电影库发现你喜欢的电影吧！
+          a.btn.btn-primary(href="/movielibrary") 浏览电影库
+
+// 我的评分页面特有的JS
+block extraJS
+  script.
+    // 确认删除评分
+    function confirmDelete(button) {
+      if (confirm('确定要删除这条评分记录吗？')) {
+        button.parentElement.submit();
+      }
+    }
+
+    // 编辑评分（需要根据你的评分系统实现）
+    function editRating(movieId, currentRating) {
+      // 这里可以弹出评分修改对话框
+      alert(`修改电影ID ${movieId} 的评分（当前评分：${currentRating}）\n这个功能需要你根据评分系统来实现`);
+
+      // 示例：跳转到评分页面
+      // window.location.href = `/rate-movie?movieid=${movieId}&userid=${window.appState.userId}`;
+    }
+
+    // 排序功能（可以根据需要实现）
+    function sortRatings(sortBy) {
+      const items = document.querySelectorAll('.rating-item');
+      const container = document.querySelector('.ratings-list');
+
+      // 这里可以实现按不同方式排序的逻辑
+      // 例如按评分高低、按时间等
+    }
+
+    // 页面加载时的初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      // 可以在这里添加一些初始化逻辑
+      console.log('我的评分页面加载完成');
+    });
