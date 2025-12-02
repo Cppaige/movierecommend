@@ -1,6 +1,10 @@
 # movierecommend
 *已经解决的问题可以标注某某人已解决*
 
+## 新增！
+用session来解决登录不统一的问题，需要下载一个新的东西在movierecommendapp的目录下:
+
+`npm install express-session`
 ## 问题 & 解决
 1. 数据库显示中文问题
    
