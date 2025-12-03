@@ -1,0 +1,340 @@
+
+extends layout-v2
+
+block content
+  .favorites-container
+    .header
+      .header-content
+        h1
+          i.fas.fa-heart
+          | 我的收藏
+        p 收藏了 #{favorites.length} 部电影
+      .header-actions
+        a.btn-back(href='/')
+          i.fas.fa-home
+          | 返回首页
+
+    if favorites && favorites.length > 0
+      .movies-grid
+        each movie in favorites
+          .movie-card(data-movie-id=movie.id)
+            .card-top
+              a(href=`/movie/${movie.id}`)
+                img(src=movie.poster, alt=movie.title)
+              .movie-actions
+                button.favorite-btn.favorited(onclick=`toggleFavorite(${movie.id})`, title="取消收藏")
+                  i.fas.fa-heart
+                button.rate-btn(onclick=`viewMovieDetail(${movie.id})`, title="查看详情")
+                  i.fas.fa-info-circle
+            .card-bottom
+              h3
+                a(href=`/movie/${movie.id}`)= movie.title
+              .meta
+                .tags
+                  each genre in movie.genres
+                    span.tag= genre
+                .rating
+                  i.fas.fa-star
+                  span= movie.rating
+              .extra-info
+                span.year
+                  i.fas.fa-calendar
+                  | #{movie.releaseYear}
+                if movie.director
+                  span.director
+                    i.fas.fa-user-tie
+                    | #{movie.director}
+    else
+      .empty-state
+        i.fas.fa-heart-broken
+        h3 还没有收藏任何电影
+        p 去电影库或推荐页面收藏你喜欢的电影吧
+        .actions
+          a.btn-action(href='/movielibrary')
+            i.fas.fa-film
+            | 浏览电影库
+          if ratedMovies && ratedMovies.length > 0
+            a.btn-action(href='/recommendmovieforuser')
+              i.fas.fa-star
+              | 查看推荐
+
+block extraCSS
+  style.
+    .favorites-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      min-height: 80vh;
+    }
+
+    .header {
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 15px;
+      color: white;
+    }
+
+    .header-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-content p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 25px;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .movies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 30px;
+    }
+
+    .movie-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .card-top {
+      position: relative;
+      height: 330px;
+      overflow: hidden;
+    }
+
+    .card-top img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .movie-card:hover .card-top img {
+      transform: scale(1.05);
+    }
+
+    .movie-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .favorite-btn, .rate-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(0,0,0,0.6);
+      color: white;
+    }
+
+    .favorite-btn.favorited {
+      background: #ff6b6b;
+    }
+
+    .favorite-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .rate-btn {
+      background: rgba(0,0,0,0.6);
+    }
+
+    .rate-btn:hover {
+      background: #667eea;
+    }
+
+    .card-bottom {
+      padding: 20px;
+    }
+
+    .card-bottom h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-bottom h3 a {
+      color: #333;
+      transition: color 0.3s;
+    }
+
+    .card-bottom h3 a:hover {
+      color: #667eea;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: #f0f0f0;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #ffc107;
+      font-weight: 600;
+    }
+
+    .extra-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #999;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .extra-info span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: #999;
+    }
+
+    .empty-state i {
+      font-size: 80px;
+      margin-bottom: 30px;
+      color: #ddd;
+    }
+
+    .empty-state h3 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: #666;
+    }
+
+    .empty-state p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 30px;
+      background: #667eea;
+      color: white;
+      border-radius: 25px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .btn-action:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+    }
+
+block extraJS
+  script.
+    // 切换收藏状态
+    function toggleFavorite(movieId) {
+      fetch('/api/favorites/remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ movieid: movieId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // 移除卡片
+          const card = document.querySelector(`[data-movie-id="${movieId}"]`);
+          if (card) {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+              card.remove();
+              // 检查是否还有收藏
+              const remaining = document.querySelectorAll('.movie-card').length;
+              if (remaining === 0) {
+                location.reload();
+              }
+            }, 300);
+          }
+        } else {
+          alert(data.message || '取消收藏失败');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('操作失败，请重试');
+      });
+    }
+
+    // 查看电影详情
+    function viewMovieDetail(movieId) {
+      window.location.href = `/movie/${movieId}`;
+    }

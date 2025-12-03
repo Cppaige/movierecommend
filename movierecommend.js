@@ -289,9 +289,9 @@ app.get('/movie-selection-rating', function(req, res) {
     var userid = req.session.userId;
     var username = req.session.username;
 
-    // 获取电影数据（分批次显示）
+    // 获取电影数据（增加到200部，分批次显示）
     connection.query(
-        "SELECT movieid, moviename, picture, typelist, averating FROM movieinfo ORDER BY RAND() LIMIT 100",
+        "SELECT movieid, moviename, picture, typelist, averating FROM movieinfo ORDER BY RAND() LIMIT 200",
         function(error, results, fields) {
             if (error) {
                 console.log("查询电影失败: " + error);
@@ -299,14 +299,14 @@ app.get('/movie-selection-rating', function(req, res) {
                 return;
             }
 
-            // 将电影分成5批，每批20部
+            // 将电影分成多批，每批30部（增加每批数量）
             var batches = [];
-            var batchSize = 20;
+            var batchSize = 30;
             for (var i = 0; i < results.length; i += batchSize) {
                 batches.push(results.slice(i, i + batchSize));
             }
 
-            res.render('movie-selection-rating', {
+            res.render('movie-rating-simple', {
                 username: username,
                 userid: userid,
                 minSelectionRequired: 10, // 最少选择10部

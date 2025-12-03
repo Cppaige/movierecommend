@@ -1,0 +1,118 @@
+extends layout-v2
+
+block extraCSS
+  link(rel='stylesheet', href='/css/rating-simple.css')
+
+block content
+  .rating-page-container
+    // 页面头部 - Apple 风格
+    .rating-header.glass-effect
+      .header-content
+        h1 为你看过的电影评分
+        p.subtitle 选择电影并评分，帮助我们更好地了解你的观影喜好
+        .progress-info
+          span.progress-label 评分进度
+          .progress-bar-container
+            .progress-bar-track
+              .progress-bar-fill(id="progressFill", style="width: 0%")
+            span.progress-text
+              span(id="selectedCount") 0
+              | /#{minSelectionRequired}
+
+      .header-actions
+        .batch-nav
+          button.batch-btn(type="button", onclick="loadPrevBatch()", title="上一批")
+            i.fas.fa-chevron-left
+          span.batch-info 第
+            span(id="batchNum") #{currentBatchIndex + 1}
+            |  批 / 共 #{totalBatches} 批
+          button.batch-btn(type="button", onclick="loadNextBatch()", title="下一批")
+            i.fas.fa-chevron-right
+
+    form(id="movieSelectionForm", action='/submit-and-recommend', method='post')
+      input(type='hidden', name='userid', value=userid)
+      input(type='hidden', name='selectedData', id="selectedData", value='')
+
+      script.
+        window.currentBatchIndex = #{currentBatchIndex};
+        window.totalBatches = #{totalBatches};
+        window.minSelectionRequired = #{minSelectionRequired};
+        window.userid = '#{userid}';
+        window.username = '#{username}';
+        try {
+          window.movieBatches = !{JSON.stringify(movieBatches).replace(/</g, '\\u003c')};
+        } catch(e) {
+          console.error('电影数据解析错误:', e);
+          window.movieBatches = [];
+        }
+
+      // 电影网格
+      .movies-grid(id="moviesGrid")
+        - var currentBatch = movieBatches[currentBatchIndex] || []
+        - if (currentBatch.length > 0)
+          - for(var i = 0; i < currentBatch.length; i++)
+            - var movie = currentBatch[i]
+            .movie-rating-card(
+              id=`movie-${movie.movieid}`,
+              data-movie-id=movie.movieid,
+              onclick=`selectMovie('${movie.movieid}')`
+            )
+              .card-poster
+                if movie.picture
+                  img(src=movie.picture, alt=movie.moviename)
+                else
+                  .poster-placeholder
+                    i.fas.fa-film
+                .rating-overlay(id=`overlay-${movie.movieid}`)
+                  .rating-stars
+                    - for(var star = 1; star <= 5; star++)
+                      label.star-label(
+                        data-star=star,
+                        onclick=`rateMovie('${movie.movieid}', ${star}); event.stopPropagation();`
+                      )
+                        i.fas.fa-star
+
+              .card-info
+                h3.movie-title(title=movie.moviename) #{movie.moviename}
+                if movie.typelist
+                  .movie-genres
+                    each tag in movie.typelist.split(',').slice(0, 2)
+                      span.genre-tag= tag.trim()
+                if movie.averating
+                  .movie-avg-rating
+                    i.fas.fa-star
+                    span #{movie.averating}
+
+              .rating-status(id=`status-${movie.movieid}`)
+                span.status-text 点击评分
+        - else
+          .empty-state
+            i.fas.fa-film
+            h3 暂无电影数据
+            p 请刷新页面重试
+            button.btn.btn-primary(onclick='location.reload()') 刷新页面
+
+      // 底部控制栏
+      .rating-controls.glass-effect
+        .controls-content
+          .stats-display
+            .stat-item
+              i.fas.fa-check-circle
+              span 已评分：
+              strong(id="ratedCount") 0
+              | 部
+            .stat-item.tip
+              i.fas.fa-info-circle
+              span 点击电影海报展开星星评分
+
+          button.btn.btn-primary.submit-btn(
+            type="button",
+            id="submitButton",
+            disabled=true,
+            onclick="submitRatings()"
+          )
+            i.fas.fa-magic
+            span 完成评分，获取推荐
+
+block extraJS
+  script(src="/js/rating-simple.js")

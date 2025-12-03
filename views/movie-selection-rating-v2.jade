@@ -1,0 +1,177 @@
+extends layout-v2
+
+
+block content
+  .rating-container
+    .rating-header
+      .header-content
+        h1
+          i.fas.fa-star
+          | 为电影评分
+        .user-welcome
+          span 你好，#{username}
+        p.instruction 点击电影海报进行评分，至少评分 #{minSelectionRequired} 部电影后可提交
+
+    .rating-main
+      .rating-sidebar
+        .progress-card
+          .progress-header
+            i.fas.fa-chart-line
+            span 评分进度
+          .progress-content
+            .progress-circle
+              svg(width="120", height="120")
+                circle.progress-bg(cx="60", cy="60", r="50")
+                circle.progress-bar(id="progressCircle", cx="60", cy="60", r="50")
+              .progress-text
+                span.progress-number(id="ratedCount") 0
+                span.progress-total / #{minSelectionRequired}
+            .progress-info
+              p
+                i.fas.fa-check-circle
+                | 已评分:
+                strong(id="ratedCountText") 0
+                | 部
+              p
+                i.fas.fa-hourglass-half
+                | 还需:
+                strong(id="remainingCount") #{minSelectionRequired}
+                | 部
+
+        .batch-card
+          .batch-header
+            i.fas.fa-layer-group
+            span 电影批次
+          .batch-navigation
+            button.batch-btn.batch-prev(type="button", onclick="loadPrevBatch()", title="上一批")
+              i.fas.fa-chevron-left
+            .batch-info
+              span.batch-current(id="batchInfo") 1 / #{totalBatches}
+            button.batch-btn.batch-next(type="button", onclick="loadNextBatch()", title="下一批")
+              i.fas.fa-chevron-right
+
+        .action-card
+          button.submit-btn(
+            type="button",
+            id="submitButton",
+            disabled=true,
+            onclick="submitRatings()"
+          )
+            i.fas.fa-paper-plane
+            | 完成评分
+          p.submit-hint 评分后获取个性化推荐
+
+      .movies-section
+        .movies-grid(id="moviesGrid")
+          - var currentBatch = movieBatches[currentBatchIndex] || []
+          - if (currentBatch.length > 0)
+            - for(var i = 0; i < currentBatch.length; i++)
+              - var movie = currentBatch[i]
+              .movie-card(
+                id=`movie-${movie.movieid}`,
+                data-movie-id=movie.movieid,
+                onclick=`selectMovie('${movie.movieid}')`
+              )
+                .movie-poster
+                  if movie.picture
+                    img(src=movie.picture, alt=movie.moviename, onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'")
+                  else
+                    .poster-placeholder
+                      i.fas.fa-film
+                  .movie-overlay
+                    i.fas.fa-star
+                    span 点击评分
+
+                .movie-info
+                  .movie-title(title=movie.moviename) #{movie.moviename}
+                  if movie.typelist
+                    .movie-genres
+                      - var genres = movie.typelist.split(',').slice(0, 2)
+                      each genre in genres
+                        span.genre-tag= genre.trim()
+                  if movie.averating
+                    .movie-rating
+                      i.fas.fa-star
+                      span= movie.averating
+
+                .rating-badge(id=`badge-${movie.movieid}`, style="display: none;")
+                  i.fas.fa-check
+                  span.rating-text 已评分
+
+          - else
+            .no-movies
+              i.fas.fa-film
+              h3 暂无电影数据
+              p 请尝试切换批次或刷新页面
+
+  // 评分弹窗
+  .rating-modal(id="ratingModal", style="display: none;")
+    .modal-overlay(onclick="closeRatingModal()")
+    .modal-content
+      button.modal-close(onclick="closeRatingModal()")
+        i.fas.fa-times
+
+      .modal-body
+        .movie-detail
+          .movie-poster-large(id="modalPoster")
+          .movie-detail-info
+            h2.movie-title-large(id="modalTitle")
+            .movie-meta-info
+              span.meta-item(id="modalGenres")
+              span.meta-item(id="modalRating")
+
+        .rating-section
+          h3 为这部电影评分
+          .star-rating
+            - for(var star = 1; star <= 5; star++)
+              label.star-label(data-value=star, onclick=`selectRating(${star})`)
+                input(type="radio", name="rating", value=star, style="display: none;")
+                i.fas.fa-star
+          .rating-description
+            p.rating-desc(id="ratingDesc") 请选择评分
+
+          .quick-rating
+            button.quick-btn(onclick="selectRating(5)")
+              i.fas.fa-heart
+              | 超级喜欢
+            button.quick-btn(onclick="selectRating(4)")
+              i.fas.fa-thumbs-up
+              | 很不错
+            button.quick-btn(onclick="selectRating(3)")
+              i.fas.fa-meh
+              | 还可以
+            button.quick-btn(onclick="selectRating(2)")
+              i.fas.fa-thumbs-down
+              | 不太行
+            button.quick-btn(onclick="selectRating(1)")
+              i.fas.fa-times
+              | 很差劲
+
+      .modal-footer
+        button.modal-btn.btn-cancel(onclick="closeRatingModal()")
+          i.fas.fa-times
+          | 取消
+        button.modal-btn.btn-confirm(onclick="confirmRating()", disabled=true)
+          i.fas.fa-check
+          | 确认评分
+
+  script.
+    // 传递服务器数据到JavaScript
+    window.currentBatchIndex = #{currentBatchIndex};
+    window.totalBatches = #{totalBatches};
+    window.minSelectionRequired = #{minSelectionRequired};
+    window.userid = '#{userid}';
+    window.username = '#{username}';
+
+    try {
+      window.movieBatches = !{JSON.stringify(movieBatches).replace(/</g, '\\u003c')};
+    } catch(e) {
+      console.error('电影数据解析错误:', e);
+      window.movieBatches = [];
+    }
+
+block extraJS
+  script(src="/js/movie-rating-simple.js")
+
+block extraCSS
+  link(rel='stylesheet', href='/css/movie-rating-simple.css')

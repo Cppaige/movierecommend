@@ -1,0 +1,122 @@
+extends layout-v2
+
+block extraCSS
+  link(rel='stylesheet', href='/css/index-page.css')
+
+block content
+  // 焦点轮播区
+  section.hero
+    .hero-container
+      .carousel
+        .carousel-track
+          .carousel-item
+            img(src='https://media.themoviedb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', alt='Interstellar')
+          .carousel-item
+            img(src='https://media.themoviedb.org/t/p/w500/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg', alt='Inception')
+          .carousel-item
+            img(src='https://media.themoviedb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg', alt='Forrest Gump')
+
+        .carousel-control.prev
+          i.fas.fa-chevron-left
+        .carousel-control.next
+          i.fas.fa-chevron-right
+
+        .carousel-indicators
+          span.indicator(data-index='0')
+          span.indicator(data-index='1')
+          span.indicator(data-index='2')
+
+      .movie-intro
+        .intro-content.active
+          h2 星际穿越
+          p 跨越时空的宇宙冒险，为了人类存续的终极探索
+        .intro-content
+          h2 盗梦空间
+          p 多层梦境交织的烧脑谜题，现实与虚幻的边界逐渐模糊
+        .intro-content
+          h2 阿甘正传
+          p 平凡人生的不凡旅程，用执着与善良诠释生命的真谛
+
+  // 使用指南
+  section.how-it-works
+    .container
+      .section-header
+        h2 Find Your Movie
+        p 三步解锁专属片单，精准匹配你的观影喜好
+
+      .steps-container
+        .step
+          .step-icon
+            i.fas.fa-user-plus
+          .step-content
+            h3 登录注册
+            p 创建账号或登录，开启个性化推荐之旅
+
+        .step
+          .step-icon
+            i.fas.fa-star
+          .step-content
+            h3 评分电影
+            p 为看过的电影打分，让系统读懂你的口味
+
+        .step
+          .step-icon
+            i.fas.fa-magic
+          .step-content
+            h3 获得推荐
+            p 基于你的评分，生成专属个性化片单
+
+  // 评分入口
+  section.rating-entry
+    .container
+      .entry-card
+        h2 Ready To GO?
+        p 为电影评分，解锁更精准的推荐
+
+        if isLogin
+          a.btn.btn-primary(href=`/select-movies`) 开始评分
+        else
+          a.btn.btn-primary(href='/loginpage') 登录后评分
+
+        .tip
+          i.fas.fa-info-circle
+          | 登录后可保存评分记录，持续优化推荐结果
+
+  // 个性化推荐
+  section.recommend
+    .container
+      .section-header
+        h2 个性化推荐
+        if isLogin && ratedMovies.length > 0
+          a.view-all-link(href='/recommendmovieforuser')
+            | 查看完整推荐
+            i.fas.fa-arrow-right
+
+      .movies-grid#recommend-grid
+        if isLogin && ratedMovies.length > 0
+          each movie in recommendedMovies || []
+            .movie-card(data-movie-id=movie.movieid)
+              .card-image
+                img(src=movie.picture, alt=movie.moviename)
+              .card-content
+                h3= movie.moviename
+                .meta
+                  span.genre= movie.typelist || '未知类型'
+                  span.rating
+                    i.fas.fa-star
+                    | #{movie.averating || '0.0'}
+        else if isLogin
+          .empty-state
+            i.fas.fa-star
+            h3 开始你的推荐之旅
+            p 评分电影后，我们将为你生成专属推荐
+            a.btn.btn-secondary(href='/select-movies') 去评分
+        else
+          .empty-state
+            i.fas.fa-film
+            h3 发现你的下一部好电影
+            p 登录后获取个性化推荐
+            a.btn.btn-secondary(href='/loginpage') 立即登录
+
+block extraJS
+  script(src='/js/index-page.js')

@@ -1,0 +1,264 @@
+/* ================================
+   复古高级色调主题
+   ================================ */
+
+:root {
+  /* 复古色调 - 暖色系 */
+  --vintage-gold: #d4af37;
+  --vintage-bronze: #8b6f47;
+  --vintage-brown: #6b5d52;
+  --vintage-cream: #f5f0e8;
+  --vintage-beige: #e8dcc5;
+  --vintage-dark: #3d3832;
+
+  /* 辅助色 */
+  --accent-burgundy: #8b4049;
+  --accent-teal: #5a7d7c;
+  --accent-sage: #9b9b7a;
+
+  /* 文字色 */
+  --text-primary: #3d3832;
+  --text-secondary: #6b5d52;
+  --text-muted: #968976;
+
+  /* 背景色 */
+  --bg-main: #f5f0e8;
+  --bg-card: #ffffff;
+  --bg-overlay: rgba(61, 56, 50, 0.85);
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(61, 56, 50, 0.08);
+  --shadow-md: 0 4px 20px rgba(61, 56, 50, 0.12);
+  --shadow-lg: 0 8px 30px rgba(61, 56, 50, 0.15);
+}
+
+/* 覆盖全局背景 */
+body {
+  background: var(--vintage-cream);
+  color: var(--text-primary);
+}
+
+/* 导航栏复古风格 */
+#header {
+  background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-bronze) 100%);
+  box-shadow: var(--shadow-md);
+}
+
+.logo {
+  color: var(--vintage-gold);
+}
+
+.logo:hover {
+  color: var(--vintage-beige);
+}
+
+.main-nav li a {
+  color: var(--vintage-beige);
+}
+
+.main-nav li a:hover {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--vintage-gold);
+}
+
+.welcome {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+}
+
+/* 按钮复古风格 */
+.btn-login {
+  color: var(--vintage-gold);
+  border-color: var(--vintage-gold);
+}
+
+.btn-login:hover {
+  background: var(--vintage-gold);
+  color: var(--vintage-dark);
+}
+
+.btn-signup {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+}
+
+.btn-signup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+  color: var(--vintage-dark);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+/* 页脚复古风格 */
+#footer {
+  background: var(--vintage-dark);
+}
+
+.footer-brand .logo {
+  color: var(--vintage-gold);
+}
+
+.link-group h4 {
+  color: var(--vintage-gold);
+}
+
+/* 页面头部复古风格 */
+.page-header {
+  background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-bronze) 100%);
+  box-shadow: var(--shadow-lg);
+  color: var(--vintage-beige);
+}
+
+.page-header h1 {
+  color: var(--vintage-gold);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.page-actions .btn {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--vintage-gold);
+  color: var(--vintage-beige);
+}
+
+.page-actions .btn:hover {
+  background: var(--vintage-gold);
+  color: var(--vintage-dark);
+}
+
+/* 控制栏复古风格 */
+.controls-bar {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--vintage-beige);
+}
+
+.controls-bar .control-btn {
+  border-color: var(--vintage-beige);
+  color: var(--text-secondary);
+}
+
+.controls-bar .control-btn:hover {
+  background: var(--vintage-beige);
+  border-color: var(--vintage-bronze);
+  color: var(--vintage-brown);
+}
+
+.controls-bar .control-btn.active {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+  color: var(--vintage-dark);
+  border-color: transparent;
+}
+
+/* 卡片复古风格 */
+.movie-card, .card {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--vintage-beige);
+}
+
+.movie-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--vintage-bronze);
+}
+
+.movie-card .genre {
+  background: var(--vintage-beige);
+  color: var(--vintage-brown);
+}
+
+.movie-card .rating {
+  color: var(--vintage-gold);
+}
+
+.movie-card .overlay-action {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+  color: var(--vintage-dark);
+}
+
+.movie-card .action-btn {
+  background: rgba(61, 56, 50, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.movie-card .action-btn:hover {
+  background: var(--vintage-bronze);
+}
+
+.movie-card .action-btn.favorited {
+  background: var(--accent-burgundy);
+}
+
+/* 分页复古风格 */
+.pagination .page-btn {
+  border-color: var(--vintage-beige);
+  color: var(--text-secondary);
+  background: var(--bg-card);
+}
+
+.pagination .page-btn:hover {
+  background: var(--vintage-beige);
+  border-color: var(--vintage-bronze);
+  color: var(--vintage-brown);
+}
+
+.pagination .page-btn.active {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+  color: var(--vintage-dark);
+  border-color: transparent;
+}
+
+/* 详情页复古风格 */
+.detail-section h2 {
+  border-bottom-color: var(--vintage-gold);
+  color: var(--vintage-brown);
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.rating-value {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.detail-value .genre {
+  background: var(--vintage-beige);
+  color: var(--vintage-brown);
+}
+
+/* 空状态复古风格 */
+.empty-state i {
+  color: var(--vintage-beige);
+}
+
+.empty-state h3 {
+  color: var(--text-secondary);
+}
+
+/* 优化字体 */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.movie-card h3 {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 600;
+  color: var(--vintage-brown);
+}
+
+/* 滚动条复古风格 */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--vintage-gold), var(--vintage-bronze));
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vintage-beige);
+}

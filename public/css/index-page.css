@@ -1,0 +1,475 @@
+/* ================================
+   首页专属样式
+   ================================ */
+
+/* Hero轮播区 - Apple 风格，超大视觉冲击 */
+.hero {
+  background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-container {
+  max-width: 1800px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 500px 1fr;
+  gap: 100px;
+  align-items: center;
+  min-height: 750px;
+  padding: 60px 60px 80px 60px;
+}
+
+/* 轮播 - 超大尺寸 */
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 680px;
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.25);
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+}
+
+.carousel-item {
+  min-width: 100%;
+  height: 680px;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.carousel-control:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-control.prev {
+  left: 24px;
+}
+
+.carousel-control.next {
+  right: 24px;
+}
+
+.carousel-indicators {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.indicator {
+  width: 48px;
+  height: 5px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.indicator.active {
+  background: white;
+  width: 72px;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
+}
+
+/* 电影介绍 - Apple 风格 */
+.movie-intro {
+  position: relative;
+  height: 240px;
+  color: #1d1d1f;
+}
+
+.intro-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-content.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.intro-content h2 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #007aff, #af52de);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -2px;
+}
+
+.intro-content p {
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: #6e6e73;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+
+/* 使用指南 */
+.how-it-works {
+  background: white;
+  padding: 80px 0;
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 50px;
+}
+
+.step {
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 16px;
+  transition: all 0.3s;
+}
+
+.step:hover {
+  background: #f8f9ff;
+  transform: translateY(-10px);
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.step-content h3 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.step-content p {
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+/* 评分入口 */
+.rating-entry {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.rating-entry::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: pulse 15s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-10%, -10%) scale(1.1); }
+}
+
+.entry-card {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.entry-card h2 {
+  font-size: 3rem;
+  color: white;
+  margin-bottom: 20px;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.entry-card p {
+  font-size: 1.3rem;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 40px;
+}
+
+.entry-card .btn-primary {
+  font-size: 1.2rem;
+  padding: 18px 50px;
+  background: white;
+  color: #667eea;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.entry-card .btn-primary:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+}
+
+.tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.95rem;
+}
+
+/* 推荐区 */
+.recommend {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.view-all-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #667eea;
+  font-weight: 500;
+  padding: 10px 20px;
+  border: 2px solid #667eea;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+.view-all-link:hover {
+  background: #667eea;
+  color: white;
+  transform: translateX(5px);
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.movie-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.movie-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.card-image {
+  position: relative;
+  height: 340px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.movie-card:hover .card-image img {
+  transform: scale(1.1);
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.card-content h3 {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  height: 2.4em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.genre {
+  color: #7f8c8d;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-state i {
+  font-size: 5rem;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 2rem;
+  color: #7f8c8d;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  color: #95a5a6;
+  margin-bottom: 30px;
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .hero-container {
+    grid-template-columns: 350px 1fr;
+    gap: 40px;
+    min-height: 500px;
+  }
+
+  .carousel-item {
+    height: 450px;
+  }
+
+  .intro-content h2 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  .carousel-item {
+    height: 400px;
+  }
+
+  .movie-intro {
+    height: auto;
+    margin-top: 40px;
+  }
+
+  .steps-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-item {
+    height: 350px;
+  }
+
+  .intro-content h2 {
+    font-size: 2rem;
+  }
+
+  .intro-content p {
+    font-size: 1rem;
+  }
+
+  .entry-card h2 {
+    font-size: 2rem;
+  }
+
+  .entry-card p {
+    font-size: 1.1rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-container {
+    padding: 20px 16px;
+  }
+
+  .carousel-item {
+    height: 300px;
+  }
+
+  .entry-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: 1fr;
+  }
+}
