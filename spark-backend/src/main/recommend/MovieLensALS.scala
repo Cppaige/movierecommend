@@ -43,8 +43,7 @@ object MovieLensALS {
     val movieLensHomeDir = args(0)
     // 装载样本评分数据,其中最后一列 Timestamp 取除 10 的余数作为 key,Rating 为值,即(Int,Rating)
     //ratings.dat 原始数据:用户编号、电影编号、评分、评分时间戳
-    val ratings = spark.sparkContext.textFile(new File(movieLensHomeDir,
-      "ratings.dat").toString).map { line =>
+    val ratings = spark.sparkContext.textFile(movieLensHomeDir + "/ratings.dat").map { line =>
       val fields = line.split("::")
       (fields(3).toLong % 10, Rating(fields(0).toInt, fields(1).toInt,
         fields(2).toDouble))
@@ -53,8 +52,7 @@ object MovieLensALS {
 
     //装载电影目录对照表(电影 ID->电影标题)
     //movies.dat 原始数据:电影编号、电影名称、电影类别
-    val movies = spark.sparkContext.textFile(new File(movieLensHomeDir,
-      "movies.dat").toString).map { line =>
+    val movies = spark.sparkContext.textFile(movieLensHomeDir + "/movies.dat").map { line =>
       val fields = line.split("::")
       (fields(0).toInt, fields(1).toString())
     }.collect().toMap

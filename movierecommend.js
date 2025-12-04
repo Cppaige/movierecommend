@@ -959,7 +959,7 @@ app.post('/api/recommend/generate', function(req, res) {
 
                     // 配置参数 (根据实际部署环境修改)
                     const SPARK_SUBMIT = process.env.SPARK_SUBMIT_PATH || 'spark-submit';
-                    const JAR_PATH = process.env.SPARK_JAR_PATH || '/home/hadoop/jars/Film_Recommend_Dataframe-1.0-SNAPSHOT.jar';
+                    const JAR_PATH = process.env.SPARK_JAR_PATH || '/home/hadoop/movierecommendapp/spark-backend/out/artifacts/Film_Recommend_Dataframe_jar/Film_Recommend_Dataframe.jar';
                     const HDFS_PATH = process.env.HDFS_PATH || 'hdfs://localhost:9000/user/hadoop/movielens';
                     const SPARK_MASTER = process.env.SPARK_MASTER || 'local[*]';
 
