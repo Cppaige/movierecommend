@@ -110,7 +110,7 @@ app.get('/', function (req, res) {
                     }
 
                     // 渲染首页
-                    res.render('index-v2', {
+                    res.render('index', {
                         title: 'MovieMatrix - 智能电影推荐',
                         ratedMovies: ratedMovies,
                         recommendedMovies: recommendedMovies
@@ -119,7 +119,7 @@ app.get('/', function (req, res) {
                 });
             } else {
                 // 没有评分记录，直接渲染
-                res.render('index-v2', {
+                res.render('index', {
                     title: 'MovieMatrix - 智能电影推荐',
                     ratedMovies: ratedMovies,
                     recommendedMovies: []
@@ -128,7 +128,7 @@ app.get('/', function (req, res) {
         });
     } else {
         // 未登录用户
-        res.render('index-v2', {
+        res.render('index', {
             title: 'MovieMatrix - 智能电影推荐',
             ratedMovies: [],
             recommendedMovies: []
@@ -306,7 +306,7 @@ app.get('/movie-selection-rating', function(req, res) {
                 batches.push(results.slice(i, i + batchSize));
             }
 
-            res.render('movie-rating-simple', {
+            res.render('movie-selection-rating', {
                 username: username,
                 userid: userid,
                 minSelectionRequired: 10, // 最少选择10部
@@ -317,69 +317,87 @@ app.get('/movie-selection-rating', function(req, res) {
         }
     );
 });
-// 3. 添加新的提交和推荐路由
+// 评分提交和推荐路由
 app.post('/submit-and-recommend', function(req, res) {
     var userid = req.body.userid;
-    var selectedData = req.body.selectedData; // 格式: "movieId:rating,movieId:rating"
+    var selectedDataStr = req.body.selectedData;
 
-    console.log("收到评分数据:", selectedData);
+    console.log("收到评分数据:", selectedDataStr);
+
+    if (!userid || !selectedDataStr) {
+        return res.status(400).json({error: "缺少必要参数"});
+    }
+
+    // 解析 JSON 格式的评分数据
+    var ratingsData;
+    try {
+        ratingsData = JSON.parse(selectedDataStr);
+    } catch (e) {
+        console.error("解析评分数据失败:", e);
+        return res.status(400).json({error: "评分数据格式错误"});
+    }
+
+    if (!Array.isArray(ratingsData) || ratingsData.length === 0) {
+        return res.status(400).json({error: "评分数据为空"});
+    }
 
     // 1. 清空该用户的历史评分
     connection.query(
         "DELETE FROM personalratings WHERE userid = ?",
         [userid],
-        function(error, results, fields) {
+        function(error) {
             if (error) {
-                console.log("删除历史评分失败: " + error);
-                res.status(500).json({error: "删除历史评分失败"});
-                return;
+                console.error("删除历史评分失败:", error);
+                return res.status(500).json({error: "删除历史评分失败"});
             }
 
             console.log("用户 " + userid + " 的历史评分已删除");
 
-            // 2. 插入新的评分
-            var ratings = selectedData.split(',');
-            var insertedCount = 0;
-            var errors = [];
+            // 2. 批量插入新的评分
+            var insertCount = 0;
+            var totalCount = ratingsData.length;
+            var hasError = false;
+            var currentTimestamp = Math.floor(Date.now() / 1000);
 
-            ratings.forEach(ratingData => {
-                var parts = ratingData.split(':');
-                if (parts.length === 2) {
-                    var movieid = parseInt(parts[0]);
-                    var rating = parseInt(parts[1]);
-
-                    if (movieid && rating >= 1 && rating <= 5) {
-                        connection.query(
-                            "INSERT INTO personalratings SET ?",
-                            {
-                                userid: userid,
-                                movieid: movieid,
-                                rating: rating,
-                                timestamp: Math.floor(Date.now() / 1000)
-                            },
-                            function(error, results, fields) {
-                                if (error) {
-                                    console.log("插入评分失败: " + error);
-                                    errors.push(error);
-                                } else {
-                                    insertedCount++;
-                                    console.log("插入评分成功: movieid=" + movieid + ", rating=" + rating);
-                                }
+            ratingsData.forEach((item, index) => {
+                if (item.movieid && item.rating && item.rating >= 1 && item.rating <= 5) {
+                    connection.query(
+                        "INSERT INTO personalratings SET ?",
+                        {
+                            userid: userid,
+                            movieid: parseInt(item.movieid),
+                            rating: parseInt(item.rating),
+                            timestamp: currentTimestamp
+                        },
+                        function(error) {
+                            if (error) {
+                                console.error("插入评分失败:", error);
+                                hasError = true;
+                            } else {
+                                insertCount++;
+                                console.log(`插入评分成功: movieid=${item.movieid}, rating=${item.rating}`);
                             }
-                        );
-                    }
+
+                            // 所有插入完成后返回
+                            if (index === totalCount - 1) {
+                                setTimeout(() => {
+                                    console.log(`成功插入 ${insertCount}/${totalCount} 条评分记录`);
+
+                                    if (insertCount === 0) {
+                                        return res.status(500).json({error: "所有评分插入均失败"});
+                                    }
+
+                                    res.json({
+                                        success: true,
+                                        insertedCount: insertCount,
+                                        message: "评分保存成功"
+                                    });
+                                }, 500);
+                            }
+                        }
+                    );
                 }
             });
-
-            // 延迟响应，等待数据库操作完成
-            setTimeout(() => {
-                console.log("成功插入 " + insertedCount + " 条评分记录");
-
-                // 3. 直接跳转到推荐结果页面（会触发Spark任务）
-                res.json({
-                    redirectUrl: `/recommendmovieforuser?userid=${userid}&username=${req.session.username}`
-                });
-            }, 1000);
         }
     );
 });
@@ -900,6 +918,190 @@ function getRatingDistribution(ratings) {
 
     return distribution;
 }
+
+// ================================
+// Spark 推荐接口
+// ================================
+
+/**
+ * 触发 Spark 推荐计算
+ */
+app.post('/api/recommend/generate', function(req, res) {
+    var userid = req.session.userId || req.body.userid;
+
+    if (!userid) {
+        return res.status(401).json({error: "未登录"});
+    }
+
+    console.log(`开始为用户 ${userid} 生成推荐...`);
+
+    // 删除旧推荐和进度
+    connection.query(
+        "DELETE FROM recommendmovie WHERE userid = ?",
+        [userid],
+        function(error) {
+            if (error) {
+                console.error("删除旧推荐失败:", error);
+                return res.status(500).json({error: "清理旧推荐失败"});
+            }
+
+            // 删除旧进度记录
+            connection.query(
+                "DELETE FROM recommendprogress WHERE userid = ?",
+                [userid],
+                function(err) {
+                    if (err) {
+                        console.error("删除旧进度失败:", err);
+                    }
+
+                    // 调用 Spark 推荐服务
+                    const { exec } = require('child_process');
+
+                    // 配置参数 (根据实际部署环境修改)
+                    const SPARK_SUBMIT = process.env.SPARK_SUBMIT_PATH || 'spark-submit';
+                    const JAR_PATH = process.env.SPARK_JAR_PATH || '/home/hadoop/jars/Film_Recommend_Dataframe-1.0-SNAPSHOT.jar';
+                    const HDFS_PATH = process.env.HDFS_PATH || 'hdfs://localhost:9000/user/hadoop/movielens';
+                    const SPARK_MASTER = process.env.SPARK_MASTER || 'local[*]';
+
+                    // 构建 spark-submit 命令
+                    const command = `${SPARK_SUBMIT} \
+                        --class recommend.MovieLensALS \
+                        --master ${SPARK_MASTER} \
+                        --driver-memory 2g \
+                        --executor-memory 4g \
+                        ${JAR_PATH} \
+                        ${HDFS_PATH} \
+                        ${userid}`;
+
+                    console.log('执行 Spark 命令:', command);
+
+                    // 异步执行 Spark 任务
+                    exec(command, { maxBuffer: 1024 * 1024 * 10 }, (execError, stdout, stderr) => {
+                        if (execError) {
+                            console.error('Spark 执行错误:', execError);
+                            console.error('stderr:', stderr);
+                            // 注意：不在这里返回响应，因为已经在下面返回了
+                            return;
+                        }
+                        console.log('Spark 执行完成:', stdout);
+                    });
+
+                    // 立即返回响应，让前端开始轮询
+                    res.json({
+                        success: true,
+                        message: "推荐任务已启动，正在后台计算中"
+                    });
+                }
+            );
+        }
+    );
+});
+
+/**
+ * 查询推荐进度
+ */
+app.get('/api/recommend/progress/:userid', function(req, res) {
+    var userid = req.params.userid;
+
+    // 优先查询进度表获取详细进度
+    connection.query(
+        "SELECT progress, step FROM recommendprogress WHERE userid = ?",
+        [userid],
+        function(error, progressResults) {
+            if (error) {
+                console.error("查询进度表失败:", error);
+                // 降级方案：只检查推荐结果
+                checkRecommendResults();
+                return;
+            }
+
+            // 如果有进度记录
+            if (progressResults.length > 0) {
+                var progressData = progressResults[0];
+                var progress = progressData.progress;
+                var step = progressData.step;
+
+                if (progress >= 100) {
+                    // 已完成，验证推荐结果
+                    connection.query(
+                        "SELECT COUNT(*) as count FROM recommendmovie WHERE userid = ?",
+                        [userid],
+                        function(err, countResults) {
+                            var count = (err || !countResults[0]) ? 0 : countResults[0].count;
+                            res.json({
+                                status: 'completed',
+                                progress: 100,
+                                step: step || '推荐已生成',
+                                count: count,
+                                message: `推荐已生成，共 ${count} 部电影`
+                            });
+                        }
+                    );
+                } else {
+                    // 进行中
+                    res.json({
+                        status: 'processing',
+                        progress: progress,
+                        step: step || '正在计算推荐',
+                        message: step || '正在生成推荐，请稍候...'
+                    });
+                }
+            } else {
+                // 没有进度记录，检查推荐结果作为降级方案
+                checkRecommendResults();
+            }
+        }
+    );
+
+    // 降级方案：仅检查推荐结果数量
+    function checkRecommendResults() {
+        connection.query(
+            "SELECT COUNT(*) as count FROM recommendmovie WHERE userid = ?",
+            [userid],
+            function(error, results) {
+                if (error) {
+                    console.error("查询推荐结果失败:", error);
+                    return res.status(500).json({error: "查询失败"});
+                }
+
+                var count = results[0].count;
+
+                if (count > 0) {
+                    res.json({
+                        status: 'completed',
+                        progress: 100,
+                        count: count,
+                        step: '推荐已生成',
+                        message: `推荐已生成，共 ${count} 部电影`
+                    });
+                } else {
+                    // 检查是否有评分数据
+                    connection.query(
+                        "SELECT COUNT(*) as count FROM personalratings WHERE userid = ?",
+                        [userid],
+                        function(err, ratingResults) {
+                            if (err || ratingResults[0].count === 0) {
+                                res.json({
+                                    status: 'no_data',
+                                    progress: 0,
+                                    step: '等待评分数据',
+                                    message: "暂无评分数据"
+                                });
+                            } else {
+                                res.json({
+                                    status: 'processing',
+                                    progress: 50,
+                                    step: '正在计算推荐',
+                                    message: "正在生成推荐，请稍候..."
+                                });
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    }
+});
 
 
 // support local visit

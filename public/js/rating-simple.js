@@ -188,6 +188,11 @@ function submitRatings() {
     return;
   }
 
+  // 禁用提交按钮
+  const submitBtn = document.getElementById('submitButton');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在保存评分...';
+
   // 准备数据
   const selectedData = [];
   ratings.forEach((rating, movieId) => {
@@ -197,11 +202,189 @@ function submitRatings() {
     });
   });
 
-  // 设置隐藏字段
-  document.getElementById('selectedData').value = JSON.stringify(selectedData);
+  // 提交评分数据
+  fetch('/submit-and-recommend', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `userid=${window.userid}&selectedData=${encodeURIComponent(JSON.stringify(selectedData))}`
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      console.log('评分保存成功:', data);
 
-  // 提交表单
-  document.getElementById('movieSelectionForm').submit();
+      // 显示推荐进度弹窗
+      showRecommendProgress();
+
+    } else {
+      alert('评分保存失败: ' + (data.error || '未知错误'));
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-magic"></i> 完成评分，获取推荐';
+    }
+  })
+  .catch(error => {
+    console.error('提交失败:', error);
+    alert('提交失败，请重试');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-magic"></i> 完成评分，获取推荐';
+  });
+}
+
+// 显示推荐进度弹窗
+function showRecommendProgress() {
+  // 创建弹窗
+  const modal = document.createElement('div');
+  modal.id = 'progressModal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      border-radius: 24px;
+      padding: 50px 60px;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    ">
+      <div style="
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #007aff, #af52de);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">
+        <i class="fas fa-magic" style="font-size: 3.5rem; color: white;"></i>
+      </div>
+
+      <h2 style="
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1d1d1f;
+        margin-bottom: 16px;
+        letter-spacing: -1px;
+      ">生成个性化推荐中</h2>
+
+      <p id="progressMessage" style="
+        font-size: 1.1rem;
+        color: #6e6e73;
+        margin-bottom: 30px;
+      ">正在分析你的观影偏好...</p>
+
+      <div style="
+        width: 100%;
+        height: 8px;
+        background: #e8e8ed;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+      ">
+        <div id="progressBar" style="
+          width: 0%;
+          height: 100%;
+          background: linear-gradient(90deg, #007aff, #af52de);
+          transition: width 0.5s ease;
+        "></div>
+      </div>
+
+      <p id="progressPercent" style="
+        font-size: 2rem;
+        font-weight: 700;
+        color: #007aff;
+      ">0%</p>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // 触发推荐生成
+  fetch('/api/recommend/generate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userid: window.userid })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('推荐任务已启动:', data);
+    // 开始轮询进度
+    pollProgress();
+  })
+  .catch(error => {
+    console.error('启动推荐失败:', error);
+    alert('启动推荐失败，请刷新页面重试');
+  });
+}
+
+// 轮询推荐进度
+function pollProgress() {
+  const progressBar = document.getElementById('progressBar');
+  const progressPercent = document.getElementById('progressPercent');
+  const progressMessage = document.getElementById('progressMessage');
+
+  // 初始状态
+  progressBar.style.width = '10%';
+  progressPercent.textContent = '10%';
+
+  // 定期检查实际进度
+  const checkInterval = setInterval(() => {
+    fetch(`/api/recommend/progress/${window.userid}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('推荐进度:', data);
+
+        // 更新进度条
+        if (data.progress !== undefined) {
+          // 平滑过渡到新进度
+          const currentProgress = parseInt(progressBar.style.width) || 10;
+          const targetProgress = Math.max(currentProgress, data.progress);
+          progressBar.style.width = targetProgress + '%';
+          progressPercent.textContent = targetProgress + '%';
+        }
+
+        // 更新进度消息
+        if (data.step) {
+          progressMessage.textContent = data.step;
+        } else if (data.message) {
+          progressMessage.textContent = data.message;
+        }
+
+        // 检查是否完成
+        if (data.status === 'completed') {
+          clearInterval(checkInterval);
+
+          // 完成动画
+          progressBar.style.width = '100%';
+          progressPercent.textContent = '100%';
+          progressMessage.textContent = `太棒了！已为你推荐 ${data.count || 10} 部电影`;
+
+          // 延迟跳转
+          setTimeout(() => {
+            window.location.href = '/recommendmovieforuser';
+          }, 1500);
+        }
+      })
+      .catch(error => {
+        console.error('查询进度失败:', error);
+      });
+  }, 2000); // 每2秒查询一次
 }
 
 // 防止点击卡片时触发评分

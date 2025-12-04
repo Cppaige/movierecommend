@@ -4,83 +4,88 @@ html(lang="zh-CN")
     title= title || 'MovieMatrix - 智能电影推荐'
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    link(rel='stylesheet', href='/css/index.css')
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
-    block extraCSS  // 允许子页面添加额外的CSS
 
-  body
-    // 导航栏（黑色底色适配）- 这是所有页面共享的部分
+    // 通用基础样式（所有页面共享）
+    link(rel='stylesheet', href='/css/common.css')
+    link(rel='stylesheet', href='/css/page-common.css')
+    link(rel='stylesheet', href='/css/apple-theme.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+
+    // 允许子页面添加自己的CSS
+    block extraCSS
+
+  body(data-is-login=isLogin ? 'true' : 'false')
+    // 导航栏
     header#header
       .nav-container
-        // Logo（点击返回主页）
         a.logo(href='/')
           i.fas.fa-film
           span MovieMatrix
-        // 导航菜单
+
         nav.main-nav
           ul
             li: a(href='/') 首页
-            li: a(href='#how-it-works') 使用指南
             li: a(href='/movielibrary') 电影库
-            // 登录后显示我的评分和去评分
             if isLogin
-              li: a(href=`/favorites`) 我的收藏
-              li: a(href=`/myratings`) 我的评分
-              li: a(href=`/select-movies`) 去评分
-        // 登录/注册按钮区
+              li: a(href='/favorites')
+                i.fas.fa-heart
+                | 我的收藏
+              li: a(href='/myratings') 我的评分
+              li: a(href='/select-movies')
+                i.fas.fa-star
+                | 去评分
+
         .auth-buttons
           if isLogin
             .user-info
-              span.welcome 欢迎，#{username}
+              span.welcome
+                i.fas.fa-user-circle
+                | #{username}
               a.btn.btn-logout(href='/logout') 退出
           else
             a.btn.btn-login(href='/loginpage') 登录
             a.btn.btn-signup(href='/registerpage') 注册
 
-    // 主要内容区域 - 这是子页面插入自己内容的地方
+    // 主要内容区域
     main#main-content
       block content
 
-    // 页脚（居中，黑色底色）- 所有页面共享
-    footer
+    // 页脚
+    footer#footer
       .footer-container
-        .logo
-          i.fas.fa-film
-          span MovieMatrix
-        .links
-          a(href='#') 关于我们
-          a(href='#') 帮助中心
-          a(href='#') 隐私政策
-          a(href='#') 联系我们
-        p.copyright &copy; 2024 MovieMatrix. 保留所有权利.
+        .footer-brand
+          .logo
+            i.fas.fa-film
+            span MovieMatrix
+          p.tagline 发现你的下一部好电影
 
-    // 评分弹窗（如果需要的话）
-    .modal#rate-modal(style="display: none;")
-      .modal-inner
-        .modal-close
-          i.fas.fa-times
-        .modal-body
-          .movie-poster
-            img(src='', alt='电影海报')
-          .movie-info
-            h3#modal-title 电影名称
-            p#modal-genre 类型
-          .stars
-            i.fas.fa-star
-            i.fas.fa-star
-            i.fas.fa-star
-            i.fas.fa-star
-            i.fas.fa-star
-          .hint 选择1-5星评分
-        .modal-footer
-          button.btn-cancel 取消
-          button.btn-submit 提交
+        .footer-links
+          .link-group
+            h4 快速链接
+            a(href='/') 首页
+            a(href='/movielibrary') 电影库
+            if isLogin
+              a(href='/favorites') 我的收藏
+              a(href='/myratings') 我的评分
 
-    // 公共JS脚本
-    script(src='/js/common.js')
+          .link-group
+            h4 帮助
+            a(href='#') 使用指南
+            a(href='#') 常见问题
+            a(href='#') 联系我们
 
-    // 暴露后端状态给JS
+          .link-group
+            h4 关于
+            a(href='#') 关于我们
+            a(href='#') 隐私政策
+            a(href='#') 服务条款
+
+        .footer-bottom
+          p.copyright &copy; 2024 MovieMatrix. All rights reserved.
+
+    // 全局JS
     script.
+      // 暴露后端状态给JS
       window.appState = {
         isLogin: !{JSON.stringify(isLogin || false)},
         userId: !{JSON.stringify(userid || '')},
@@ -88,5 +93,5 @@ html(lang="zh-CN")
         ratedMovies: !{JSON.stringify(ratedMovies || [])}
       };
 
-    // 允许子页面添加额外的JS
+    // 允许子页面添加JS
     block extraJS

@@ -1,43 +1,44 @@
-extends layout-v2
+extends layout
+
+block extraCSS
+  link(rel='stylesheet', href='/css/rating-simple.css')
 
 block content
-  .movie-selection-container
-    .header
-      h1 欢迎用户: #{username}
-      p 请选择并为您看过的电影评分（已选择:
-        span(id="selectedCount") 0
-        | / #{minSelectionRequired} 部）
-      .header-actions
-        a.btn-help(href='/movielibrary', target='_blank')
-          i.fas.fa-search
-          | 去电影库查看电影信息
-        a.btn-info(href='#', onclick="showHelp()")
-          i.fas.fa-question-circle
-          | 如何操作？
+  .rating-page-container
+    // 页面头部 - Apple 风格
+    .rating-header.glass-effect
+      .header-content
+        h1 为你看过的电影评分
+        p.subtitle 选择电影并评分，帮助我们更好地了解你的观影喜好
+        .progress-info
+          span.progress-label 评分进度
+          .progress-bar-container
+            .progress-bar-track
+              .progress-bar-fill(id="progressFill", style="width: 0%")
+            span.progress-text
+              span(id="selectedCount") 0
+              | /#{minSelectionRequired}
 
-    .search-section
-      .search-wrapper
-        input.search-input(type="text", id="searchInput", placeholder="搜索电影名称...")
-        button.search-button(type="button", onclick="filterMovies()")
-          i.fas.fa-search
-          | 搜索
-      .search-tips
-        span.tip 忘记电影信息？ 
-        a.tip-link(href='/movielibrary', target='_blank') 去电影库查看详情
+      .header-actions
+        .batch-nav
+          button.batch-btn(type="button", onclick="loadPrevBatch()", title="上一批")
+            i.fas.fa-chevron-left
+          span.batch-info 第
+            span(id="batchNum") #{currentBatchIndex + 1}
+            |  批 / 共 #{totalBatches} 批
+          button.batch-btn(type="button", onclick="loadNextBatch()", title="下一批")
+            i.fas.fa-chevron-right
 
     form(id="movieSelectionForm", action='/submit-and-recommend', method='post')
       input(type='hidden', name='userid', value=userid)
       input(type='hidden', name='selectedData', id="selectedData", value='')
 
-      //- 添加数据传递脚本
       script.
-        // 将服务器端数据传递给JavaScript
         window.currentBatchIndex = #{currentBatchIndex};
         window.totalBatches = #{totalBatches};
         window.minSelectionRequired = #{minSelectionRequired};
         window.userid = '#{userid}';
         window.username = '#{username}';
-        // 电影数据
         try {
           window.movieBatches = !{JSON.stringify(movieBatches).replace(/</g, '\\u003c')};
         } catch(e) {
@@ -45,271 +46,73 @@ block content
           window.movieBatches = [];
         }
 
-      //- 初始电影展示区域
-      .movies-section
-        .section-header
-          h2 选择看过的电影并评分
-          .batch-info
-            span.batch-text 当前批次:
-            .batch-navigation
-              button.btn-batch-prev(type="button", onclick="loadPrevBatch()")
-                i.fas.fa-chevron-left
-              span.batch-current #{currentBatchIndex + 1} / #{totalBatches}
-              button.btn-batch-next(type="button", onclick="loadNextBatch()")
-                i.fas.fa-chevron-right
-
-        .movies-grid(id="moviesGrid")
-          //- 服务器端渲染的电影卡片
-          - var currentBatch = movieBatches[currentBatchIndex] || []
-          - if (currentBatch.length > 0)
-            - for(var i = 0; i < currentBatch.length; i++)
-              - var movie = currentBatch[i]
-              .movie-card(
-                id=`movie-${movie.movieid}`,
-                data-movie-id=movie.movieid
-              )
-                .card-header
-                  .movie-poster-container
-                    if movie.picture
-                      img.movie-poster(src=movie.picture, alt=movie.moviename)
-                    else
-                      .movie-poster-placeholder
-                        i.fas.fa-film
-                    .movie-actions
-                      button.btn-info-small(type="button", onclick=`viewMovieInfo('${movie.movieid}')`, title="查看详情")
-                        i.fas.fa-info-circle
-                
-                .card-body
-                  .movie-title(title=movie.moviename) #{movie.moviename}
-                  
-                  .movie-meta
-                    if movie.typelist
-                      .movie-tags
-                        each tag in movie.typelist.split(',').slice(0, 2)
-                          span.tag= tag.trim()
-                    if movie.averating
-                      .movie-rating
+      // 电影网格
+      .movies-grid(id="moviesGrid")
+        - var currentBatch = movieBatches[currentBatchIndex] || []
+        - if (currentBatch.length > 0)
+          - for(var i = 0; i < currentBatch.length; i++)
+            - var movie = currentBatch[i]
+            .movie-rating-card(
+              id=`movie-${movie.movieid}`,
+              data-movie-id=movie.movieid,
+              onclick=`selectMovie('${movie.movieid}')`
+            )
+              .card-poster
+                if movie.picture
+                  img(src=movie.picture, alt=movie.moviename)
+                else
+                  .poster-placeholder
+                    i.fas.fa-film
+                .rating-overlay(id=`overlay-${movie.movieid}`)
+                  .rating-stars
+                    - for(var star = 1; star <= 5; star++)
+                      label.star-label(
+                        data-star=star,
+                        onclick=`rateMovie('${movie.movieid}', ${star}); event.stopPropagation();`
+                      )
                         i.fas.fa-star
-                        span= movie.averating
-                  
-                  .rating-section(style="display: none;")
-                    .rating-header
-                      span.rating-title 您的评分：
-                      .rating-value(id=`rating-value-${movie.movieid}`) 未评分
-                    .rating-stars
-                      - for(var star = 5; star >= 1; star--)
-                        label.rating-star(
-                          data-star-value=star,
-                          onclick=`handleRatingChange('${movie.movieid}', ${star})`
-                        )
-                          input(
-                            type="radio",
-                            name=`rating_${movie.movieid}`,
-                            value=star
-                          )
-                          span.star ★
-                    .rating-hint 点击星星进行评分
 
-                  .checkbox-wrapper
-                    input.checkbox-input(
-                      type='checkbox',
-                      name='selectedMovies',
-                      value=movie.movieid,
-                      id=`checkbox-${movie.movieid}`,
-                      onchange=`toggleMovieSelection('${movie.movieid}')`
-                    )
-                    label.checkbox-label(for=`checkbox-${movie.movieid}`)
-                      i.fas.fa-check
-                      span 标记为已看
-          - else
-            .no-movies
-              i.fas.fa-film
-              h3 暂无电影数据
-              p 电影数据加载失败，请尝试刷新页面
-              a.btn-refresh(href='#', onclick='location.reload()') 刷新页面
+              .card-info
+                h3.movie-title(title=movie.moviename) #{movie.moviename}
+                if movie.typelist
+                  .movie-genres
+                    each tag in movie.typelist.split(',').slice(0, 2)
+                      span.genre-tag= tag.trim()
+                if movie.averating
+                  .movie-avg-rating
+                    i.fas.fa-star
+                    span #{movie.averating}
 
-      .controls-section
-        .selection-summary
-          .summary-content
-            .progress-container
-              .progress-info
-                span.progress-text 选择进度
-                span.progress-count
-                  span(id="selectedCountText") 0
-                  | /#{minSelectionRequired} 部
-              .progress-bar
-                .progress-fill(id="progressFill", style="width: 0%")
-            
-            .summary-stats
-              .stat
-                i.fas.fa-check-circle
-                span 已选择:
-                strong(id="selectedCount") 0
-              .stat
-                i.fas.fa-star
-                span 已评分:
-                strong(id="ratedCount") 0
-        
-        .action-buttons
-          button.control-button.btn-secondary(
+              .rating-status(id=`status-${movie.movieid}`)
+                span.status-text 点击评分
+        - else
+          .empty-state
+            i.fas.fa-film
+            h3 暂无电影数据
+            p 请刷新页面重试
+            button.btn.btn-primary(onclick='location.reload()') 刷新页面
+
+      // 底部控制栏
+      .rating-controls.glass-effect
+        .controls-content
+          .stats-display
+            .stat-item
+              i.fas.fa-check-circle
+              span 已评分：
+              strong(id="ratedCount") 0
+              | 部
+            .stat-item.tip
+              i.fas.fa-info-circle
+              span 点击电影海报展开星星评分
+
+          button.btn.btn-primary.submit-btn(
             type="button",
-            onclick="viewMovieLibrary()"
-          )
-            i.fas.fa-search
-            | 去电影库查看
-          
-          button.control-button.btn-primary(
-            type="button",
-            id="recommendButton",
+            id="submitButton",
             disabled=true,
-            onclick="submitForm()"
+            onclick="submitRatings()"
           )
-            span.spinner(style="display:none")
-              i.fas.fa-spinner.fa-spin
-            | 完成评分，开始推荐
-
-    //- 电影详情模态框
-    .movie-info-modal(id="movieInfoModal", style="display: none;")
-      .modal-overlay(onclick="closeMovieInfo()")
-      .modal-content
-        button.modal-close(onclick="closeMovieInfo()")
-          i.fas.fa-times
-        .modal-body(id="movieInfoContent")
-          //- 将由JS动态填充
+            i.fas.fa-magic
+            span 完成评分，获取推荐
 
 block extraJS
-  script(src="/js/movie-selection-rating.js")
-  
-  script.
-    // 查看电影详情
-    function viewMovieInfo(movieId) {
-      // 在当前批次中查找电影
-      const currentBatch = window.movieBatches[window.currentBatchIndex] || [];
-      const movie = currentBatch.find(m => m.movieid.toString() === movieId);
-      
-      if (!movie) {
-        alert('电影信息未找到');
-        return;
-      }
-      
-      const modal = document.getElementById('movieInfoModal');
-      const content = document.getElementById('movieInfoContent');
-      
-      // 构建电影详情HTML
-      content.innerHTML = `
-        <div class="movie-info-detail">
-          <div class="info-header">
-            <h2>${movie.moviename}</h2>
-            ${movie.averating ? `
-              <div class="info-rating">
-                <i class="fas fa-star"></i>
-                <span>${movie.averating}</span>
-              </div>
-            ` : ''}
-          </div>
-          
-          <div class="info-body">
-            ${movie.picture ? `
-              <div class="info-poster">
-                <img src="${movie.picture}" alt="${movie.moviename}">
-              </div>
-            ` : ''}
-            
-            <div class="info-content">
-              ${movie.movielength ? `
-                <div class="info-item">
-                  <i class="fas fa-clock"></i>
-                  <span>片长: ${movie.movielength}分钟</span>
-                </div>
-              ` : ''}
-              
-              ${movie.typelist ? `
-                <div class="info-item">
-                  <i class="fas fa-tags"></i>
-                  <span>类型: ${movie.typelist}</span>
-                </div>
-              ` : ''}
-              
-              ${movie.releasedate ? `
-                <div class="info-item">
-                  <i class="fas fa-calendar-alt"></i>
-                  <span>上映: ${movie.releasedate}</span>
-                </div>
-              ` : ''}
-              
-              ${movie.director ? `
-                <div class="info-item">
-                  <i class="fas fa-user-tie"></i>
-                  <span>导演: ${movie.director}</span>
-                </div>
-              ` : ''}
-              
-              ${movie.actorlist ? `
-                <div class="info-item">
-                  <i class="fas fa-users"></i>
-                  <span>主演: ${movie.actorlist}</span>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-          
-          <div class="info-actions">
-            <button class="btn-action" onclick="rateThisMovie('${movie.movieid}')">
-              <i class="fas fa-star"></i>
-              为该电影评分
-            </button>
-            <button class="btn-action" onclick="viewInLibrary('${movie.movieid}')">
-              <i class="fas fa-external-link-alt"></i>
-              在电影库中查看
-            </button>
-          </div>
-        </div>
-      `;
-      
-      modal.style.display = 'block';
-    }
-    
-    // 关闭电影详情
-    function closeMovieInfo() {
-      document.getElementById('movieInfoModal').style.display = 'none';
-    }
-    
-    // 为当前电影评分
-    function rateThisMovie(movieId) {
-      closeMovieInfo();
-      const checkbox = document.getElementById(`checkbox-${movieId}`);
-      if (!checkbox.checked) {
-        toggleMovieSelection(movieId);
-      }
-      // 滚动到该电影卡片
-      const card = document.getElementById(`movie-${movieId}`);
-      if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.classList.add('highlight');
-        setTimeout(() => card.classList.remove('highlight'), 2000);
-      }
-    }
-    
-    // 在电影库中查看
-    function viewInLibrary(movieId) {
-      window.open(`/movielibrary?movie=${movieId}`, '_blank');
-    }
-    
-    // 查看电影库
-    function viewMovieLibrary() {
-      window.open('/movielibrary', '_blank');
-    }
-    
-    // 显示帮助信息
-    function showHelp() {
-      alert('操作指南：\n\n1. 点击"标记为已看"选择电影\n2. 选择后会显示评分区域\n3. 点击星星进行评分（1-5星）\n4. 选择至少10部电影后可以提交\n5. 点击电影卡片上的ℹ️图标查看详情\n6. 可以去电影库查看更多电影信息');
-    }
-    
-    // 加载上一批
-    function loadPrevBatch() {
-      const total = window.totalBatches || 1;
-      window.currentBatchIndex = (window.currentBatchIndex - 1 + total) % total;
-      if (typeof renderCurrentBatch === 'function') {
-        renderCurrentBatch();
-      }
-    }
+  script(src="/js/rating-simple.js")
