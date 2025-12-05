@@ -1,22 +1,48 @@
 # movierecommend
 *已经解决的问题可以标注某某人已解决*
+## 12.5最新版本使用
+1. 数据库操作---创建用户推荐结果表
+```
+CREATE TABLE recommendmovie (
+  userid INT,
+  recommendmovieid INT,
+  degree FLOAT,  -- 推荐度
+  PRIMARY KEY (userid, recommendmovieid)
+);
+```
+2. 将dat文件上传到hadoop，**切换到dat文件所在目录，这里的hdfs路径可以根据自己想要的修改**
+```
+hadoop fs -mkdir -p /user/hadoop/movielens
+hadoop fs -put ratings.dat /user/hadoop/movielens/
+hadoop fs -put movies.dat /user/hadoop/movielens/
 
+# 验证
+hadoop fs -ls /user/hadoop/movielens
+```
+3. 修改movierecommend.js的路径配置，**第960行，只用改中间两个**
+```
+ // 配置参数 (根据实际部署环境修改)
+const SPARK_SUBMIT = process.env.SPARK_SUBMIT_PATH || 'spark-submit';
+const JAR_PATH = process.env.SPARK_JAR_PATH || '/home/hadoop/jars/Film_Recommend_Dataframe-1.0-SNAPSHOT.jar';  
+const HDFS_PATH = process.env.HDFS_PATH || 'hdfs://localhost:9000/user/hadoop/movielens';
+const SPARK_MASTER = process.env.SPARK_MASTER || 'local[*]';
+```
+> JAR_PATH改为spark-backend的out文件夹一路下去那个jar的位置，右键复制路径再复制到这里就可以
+>
+> HDFS_PATH改为刚刚hadoop上传dat的那个位置，替换/user/hadoop/movielens就可以
+
+4. 可以正常运行启动了
 ## 新增！
 用session来解决登录不统一的问题，需要下载一个新的东西在movierecommendapp的目录下:
-
-创建新表
 ```
-CREATE TABLE IF NOT EXISTS `favorites` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT '收藏记录ID',
-  `userid` INT NOT NULL COMMENT '用户ID',
-  `movieid` INT NOT NULL COMMENT '电影ID',
-  `createtime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '收藏时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_user_movie` (`userid`, `movieid`),
-  KEY `idx_userid` (`userid`),
-  KEY `idx_movieid` (`movieid`),
-  KEY `idx_createtime` (`createtime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户收藏表';
+CREATE TABLE favorites (
+id INT AUTO_INCREMENT PRIMARY KEY,
+userid INT NOT NULL,
+movieid INT NOT NULL,
+category VARCHAR(20) NOT NULL DEFAULT 'liked', -- 添加 category 列
+createtime DATETIME DEFAULT CURRENT_TIMESTAMP,
+NIQUE KEY unique_favorite (userid, movieid, category) -- 修改唯一键
+);
 ```
 
 `npm install express-session`
