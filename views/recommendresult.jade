@@ -20,30 +20,36 @@ block content
     .movies-grid
       if movieinfo && movieinfo.length > 0
         each movie in movieinfo
+          // 修改 .movie-card 部分
           .movie-card(data-movie-id=movie.movieid)
-            .card-top
-              if movie.picture
-                img(src=movie.picture, alt=movie.moviename)
-              else
-                .no-poster 暂无图片
-              .card-overlay
-                .overlay-content
-                  if movie.rating
-                    .overlay-rating
+            a(href=`/movie/${movie.movieid}`, style='display: block; text-decoration: none; color: inherit;')
+              .card-top
+                if movie.picture
+                  img(src=movie.picture, alt=movie.moviename, onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'")
+                else
+                  .no-poster 暂无图片
+                .card-overlay
+                  .overlay-content
+                    if movie.rating
+                      .overlay-rating
+                        i.fas.fa-star
+                        | 推荐度: #{movie.rating.toFixed(1)}/5.0
+                    .overlay-action
+                      i.fas.fa-external-link-alt
+                      |  查看详情
+
+              .card-content
+                h3= movie.moviename
+                if movie.rating
+                  .meta
+                    span.rating
                       i.fas.fa-star
-                      | 推荐度: #{movie.rating.toFixed(1)}/5.0
-                  .overlay-action 查看详情
-            .card-content
-              h3= movie.moviename
-              if movie.rating
-                .meta
-                  span.rating
-                    i.fas.fa-star
-                    | 推荐度 #{movie.rating.toFixed(1)}/5.0
+                      | 推荐度 #{movie.rating.toFixed(1)}/5.0
 
             .card-actions
               button.action-btn.favorite-btn(onclick=`toggleFavorite(${movie.movieid}, this); event.stopPropagation();`, title='收藏')
                 i.far.fa-heart
+
       else
         .empty-state
           i.fas.fa-film

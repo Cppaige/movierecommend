@@ -959,16 +959,22 @@ app.post('/api/recommend/generate', function(req, res) {
 
                     // 配置参数 (根据实际部署环境修改)
                     const SPARK_SUBMIT = process.env.SPARK_SUBMIT_PATH || 'spark-submit';
-                    const JAR_PATH = process.env.SPARK_JAR_PATH || '/home/hadoop/movierecommendapp/spark-backend/out/artifacts/Film_Recommend_Dataframe_jar/Film_Recommend_Dataframe.jar';
-                    const HDFS_PATH = process.env.HDFS_PATH || 'hdfs://localhost:9000/user/hadoop/movielens';
+                    const JAR_PATH = process.env.SPARK_JAR_PATH || '/home/scau11/movierecommend/spark-backend/target/Film_Recommend_Dataframe-1.0-SNAPSHOT.jar';
+                    const HDFS_PATH = process.env.HDFS_PATH || 'hdfs://localhost:9000/user/scau11/movielens';
                     const SPARK_MASTER = process.env.SPARK_MASTER || 'local[*]';
+// 新增的Spark配置
+                    const SPARK_UI_PORT = process.env.SPARK_UI_PORT || '5090';
+                    const SPARK_DRIVER_HOST = process.env.SPARK_DRIVER_HOST || '192.168.141.100';
 
                     // 构建 spark-submit 命令
                     const command = `${SPARK_SUBMIT} \
                         --class recommend.MovieLensALS \
                         --master ${SPARK_MASTER} \
                         --driver-memory 2g \
-                        --executor-memory 4g \
+                        --executor-memory 2g \
+                        --conf spark.ui.port=${SPARK_UI_PORT} \
+                        --conf spark.driver.bindAddress=${SPARK_DRIVER_HOST} \
+                        --conf spark.driver.host=${SPARK_DRIVER_HOST} \
                         ${JAR_PATH} \
                         ${HDFS_PATH} \
                         ${userid}`;
@@ -1138,36 +1144,7 @@ app.get('/recommendprogress', (req, res) => {
 
 const { spawn } = require("child_process");
 
-app.post('/startrecommend', (req, res) => {
-    if (!req.session.isLoggedIn) {
-        return res.status(403).json({ error: "请先登录" });
-    }
 
-    const userid = req.session.userId;
-
-    // Spark 必须用绝对路径
-    const sparkPath = "/usr/local/spark/bin/spark-submit";
-
-    // ALS Jar 路径（绝对路径）
-    const jarPath = "/home/hadoop/movierecommendapp/spark-backend/out/artifacts/Film_Recommend_Dataframe_jar/Film_Recommend_Dataframe.jar";
-
-    // HDFS 数据路径（你之前给我的是这个）
-    const dataPath = "/input_spark";
-
-    console.log("启动 Spark 推荐任务", userid);
-
-    const spark = spawn(sparkPath, [
-        "--class", "recommend.MovieLensALS",
-        jarPath,
-        dataPath,
-        userid
-    ]);
-
-    spark.stdout.on("data", d => console.log("Spark:", d.toString()));
-    spark.stderr.on("data", d => console.error("Spark ERROR:", d.toString()));
-
-    res.json({ status: "started" });
-});
 
 /**
  * 收藏夹相关API
