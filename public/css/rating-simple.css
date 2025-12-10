@@ -67,7 +67,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #007aff 0%, #af52de 100%);
+  background: #9AC8E4;
   border-radius: 10px;
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -75,7 +75,7 @@
 .progress-text {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #007aff;
+  color: #9AC8E4;
   min-width: 60px;
   text-align: right;
 }
@@ -112,7 +112,7 @@
 }
 
 .batch-btn:hover {
-  background: #f5f5f7;
+  background: #F0F3F5;
   border-color: #86868b;
   transform: scale(1.05);
 }
@@ -124,7 +124,7 @@
 }
 
 .batch-info span {
-  color: #007aff;
+  color: #9AC8E4;
   font-size: 1.1rem;
 }
 
@@ -154,7 +154,7 @@
 }
 
 .movie-rating-card.rated {
-  border-color: #007aff;
+  border-color: #9AC8E4;
   box-shadow: 0 4px 20px rgba(0, 122, 255, 0.2);
 }
 
@@ -162,7 +162,7 @@
 .card-poster {
   position: relative;
   height: 360px;
-  background: #f5f5f7;
+  background: #F0F3F5;
   overflow: hidden;
 }
 
@@ -262,7 +262,7 @@
 }
 
 .genre-tag {
-  background: #f5f5f7;
+  background: #F0F3F5;
   color: #6e6e73;
   padding: 5px 12px;
   border-radius: 12px;
@@ -283,7 +283,7 @@
 .rating-status {
   padding: 12px 20px;
   text-align: center;
-  background: #f5f5f7;
+  background: #F0F3F5;
   border-top: 1px solid #e8e8ed;
 }
 
@@ -294,7 +294,7 @@
 }
 
 .movie-rating-card.rated .status-text {
-  color: #007aff;
+  color: #9AC8E4;
   font-weight: 600;
 }
 
@@ -336,12 +336,12 @@
 }
 
 .stat-item i {
-  color: #007aff;
+  color: #9AC8E4;
   font-size: 1.2rem;
 }
 
 .stat-item strong {
-  color: #007aff;
+  color: #9AC8E4;
   font-size: 1.3rem;
   font-weight: 800;
 }

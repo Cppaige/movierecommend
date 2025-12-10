@@ -1,7 +1,7 @@
 /* movie-selection-rating.css */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #F0F3F5;
     min-height: 100vh;
     margin: 0;
     padding: 20px;
@@ -48,12 +48,12 @@ body {
 
 .search-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #9AC8E4;
 }
 
 .search-button {
     padding: 12px 30px;
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
     border: none;
     border-radius: 8px;
@@ -63,7 +63,7 @@ body {
 }
 
 .search-button:hover {
-    background: #764ba2;
+    background: #FFA7A6;
 }
 
 .movies-grid {
@@ -84,14 +84,14 @@ body {
 }
 
 .movie-card:hover {
-    border-color: #667eea;
+    border-color: #9AC8E4;
     transform: translateY(-5px);
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
 }
 
 .movie-card.selected {
-    border-color: #667eea;
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-color: #9AC8E4;
+    background: rgba(154, 200, 228, 0.05);
 }
 
 .movie-title {
@@ -174,7 +174,7 @@ body {
 
 .rating-value {
     font-size: 14px;
-    color: #667eea;
+    color: #9AC8E4;
     margin-top: 8px;
     font-weight: 500;
 }
@@ -199,7 +199,7 @@ body {
 }
 
 .checkbox-input:checked + .checkbox-label {
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
 }
 
@@ -308,7 +308,7 @@ body {
     width: 60px;
     height: 60px;
     border: 6px solid #f3f3f3;
-    border-top: 6px solid #667eea;
+    border-top: 6px solid #9AC8E4;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 20px;
@@ -341,7 +341,7 @@ body {
 
 .progress-container .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: #9AC8E4;
     border-radius: 5px;
     transition: width 0.5s ease;
 }
@@ -360,7 +360,7 @@ body {
 }
 
 .step.active {
-    color: #667eea;
+    color: #9AC8E4;
     font-weight: 500;
 }
 
@@ -376,7 +376,7 @@ body {
 .movie-poster-placeholder {
     width: 100%;
     height: 180px;
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    background: rgba(154, 200, 228, 0.05);
     border-radius: 6px;
     margin-bottom: 15px;
     display: flex;
@@ -428,7 +428,7 @@ body {
 }
 
 .btn-help:hover {
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
 }
 
@@ -457,7 +457,7 @@ body {
 }
 
 .tip-link {
-    color: #667eea;
+    color: #9AC8E4;
     text-decoration: none;
 }
 
@@ -512,14 +512,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #667eea;
+    color: #9AC8E4;
     transition: all 0.3s;
 }
 
 .btn-batch-prev:hover, .btn-batch-next:hover {
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
-    border-color: #667eea;
+    border-color: #9AC8E4;
 }
 
 .batch-current {
@@ -552,7 +552,7 @@ body {
 .movie-poster-placeholder {
     width: 100%;
     height: 200px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #9AC8E4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -581,7 +581,7 @@ body {
 }
 
 .btn-info-small:hover {
-    background: #667eea;
+    background: #9AC8E4;
     transform: scale(1.1);
 }
 
@@ -660,9 +660,9 @@ body {
 }
 
 .checkbox-input:checked + .checkbox-label {
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
-    border-color: #667eea;
+    border-color: #9AC8E4;
 }
 
 /* 选择进度区域 */
@@ -697,7 +697,7 @@ body {
 }
 
 .progress-count {
-    color: #667eea;
+    color: #9AC8E4;
     font-weight: 600;
 }
 
@@ -710,7 +710,7 @@ body {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ffc107, #ffd93d);
+    background: #ffc107;
     border-radius: 5px;
     transition: width 0.3s, background-color 0.3s;
 }
@@ -728,7 +728,7 @@ body {
 }
 
 .stat i {
-    color: #667eea;
+    color: #9AC8E4;
     font-size: 1.2rem;
 }
 
@@ -764,7 +764,7 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #9AC8E4;
     color: white;
     border: none;
     padding: 15px 40px;
@@ -852,7 +852,7 @@ body {
 }
 
 .modal-close:hover {
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
     transform: rotate(90deg);
 }
@@ -924,7 +924,7 @@ body {
 }
 
 .info-item i {
-    color: #667eea;
+    color: #9AC8E4;
     width: 20px;
 }
 
@@ -938,9 +938,9 @@ body {
 .btn-action {
     flex: 1;
     padding: 12px;
-    border: 2px solid #667eea;
+    border: 2px solid #9AC8E4;
     background: white;
-    color: #667eea;
+    color: #9AC8E4;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -952,7 +952,7 @@ body {
 }
 
 .btn-action:hover {
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
     transform: translateY(-2px);
 }
@@ -960,7 +960,7 @@ body {
 /* 高亮动画 */
 .movie-card.highlight {
     animation: highlightCard 2s ease;
-    box-shadow: 0 0 0 3px #667eea;
+    box-shadow: 0 0 0 3px #9AC8E4;
 }
 
 @keyframes highlightCard {
@@ -968,7 +968,7 @@ body {
         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
     50% {
-        box-shadow: 0 0 0 3px #667eea, 0 10px 40px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 0 0 3px #9AC8E4, 0 10px 40px rgba(102, 126, 234, 0.3);
     }
 }
 
@@ -998,7 +998,7 @@ body {
 .btn-refresh {
     display: inline-block;
     padding: 10px 30px;
-    background: #667eea;
+    background: #9AC8E4;
     color: white;
     text-decoration: none;
     border-radius: 8px;
@@ -1007,7 +1007,7 @@ body {
 }
 
 .btn-refresh:hover {
-    background: #764ba2;
+    background: #FFA7A6;
     transform: translateY(-2px);
 }
 

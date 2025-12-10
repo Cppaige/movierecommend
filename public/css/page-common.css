@@ -16,10 +16,10 @@
   text-align: center;
   margin-bottom: 40px;
   padding: 40px 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #9AC8E4;
   border-radius: 15px;
   color: white;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 10px 30px rgba(154, 200, 228, 0.3);
 }
 
 .page-header h1 {
@@ -102,13 +102,13 @@
 }
 
 .controls-bar .control-btn:hover {
-  background: #f8f9ff;
-  border-color: #667eea;
-  color: #667eea;
+  background: rgba(154, 200, 228, 0.1);
+  border-color: #9AC8E4;
+  color: #9AC8E4;
 }
 
 .controls-bar .control-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
   border-color: transparent;
 }
@@ -187,7 +187,7 @@
 
 .movie-card .overlay-action {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
   border-radius: 20px;
   font-weight: 600;
@@ -220,10 +220,10 @@
 }
 
 .movie-card .genre {
-  background: #f0f0ff;
+  background: rgba(154, 200, 228, 0.1);
   padding: 4px 10px;
   border-radius: 12px;
-  color: #667eea;
+  color: #9AC8E4;
   font-size: 0.85rem;
 }
 
@@ -302,13 +302,13 @@
 }
 
 .pagination .page-btn:hover {
-  background: #f8f9ff;
-  border-color: #667eea;
-  color: #667eea;
+  background: rgba(154, 200, 228, 0.1);
+  border-color: #9AC8E4;
+  color: #9AC8E4;
 }
 
 .pagination .page-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
   border-color: transparent;
 }
@@ -437,7 +437,7 @@
 .rating-value {
   font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -473,7 +473,7 @@
   color: #2c3e50;
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 3px solid #667eea;
+  border-bottom: 3px solid #9AC8E4;
   display: inline-block;
 }
 
@@ -501,10 +501,10 @@
 
 .detail-value .genre {
   display: inline-block;
-  background: #f0f0ff;
+  background: rgba(154, 200, 228, 0.1);
   padding: 4px 12px;
   border-radius: 12px;
-  color: #667eea;
+  color: #9AC8E4;
   font-size: 0.85rem;
   margin-right: 8px;
   margin-bottom: 5px;

@@ -4,7 +4,7 @@
 
 /* Hero轮播区 - Apple 风格，超大视觉冲击 */
 .hero {
-  background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+  background: #F0F3F5;
   padding: 0;
   position: relative;
   overflow: hidden;
@@ -131,7 +131,7 @@
   font-size: 3.5rem;
   font-weight: 800;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #007aff, #af52de);
+  background: #9AC8E4;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -175,7 +175,7 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 24px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -198,7 +198,7 @@
 
 /* 评分入口 */
 .rating-entry {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #9AC8E4;
   padding: 100px 0;
   position: relative;
   overflow: hidden;
@@ -245,7 +245,7 @@
   font-size: 1.2rem;
   padding: 18px 50px;
   background: white;
-  color: #667eea;
+  color: #9AC8E4;
   box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
@@ -274,16 +274,16 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #667eea;
+  color: #9AC8E4;
   font-weight: 500;
   padding: 10px 20px;
-  border: 2px solid #667eea;
+  border: 2px solid #9AC8E4;
   border-radius: 20px;
   transition: all 0.3s;
 }
 
 .view-all-link:hover {
-  background: #667eea;
+  background: #9AC8E4;
   color: white;
   transform: translateX(5px);
 }
@@ -472,4 +472,78 @@
   .movies-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* 新增动态效果 */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.rating-entry {
+  background: #9AC8E4;
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+.step:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+.step-icon {
+  animation: softGlow 3s ease-in-out infinite;
+}
+
+@keyframes softGlow {
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(255, 209, 220, 0.3);
+  }
+  50% {
+    box-shadow: 0 15px 40px rgba(255, 209, 220, 0.6);
+  }
+}
+
+.movie-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.movie-card:hover {
+  animation: gentleFloat 2s ease-in-out;
+}
+
+@keyframes gentleFloat {
+  0%, 100% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.entry-card .btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.entry-card .btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.entry-card .btn-primary:hover::after {
+  width: 300px;
+  height: 300px;
 }

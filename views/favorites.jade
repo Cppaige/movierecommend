@@ -72,7 +72,9 @@ block extraCSS
       justify-content: space-between;
       align-items: center;
       padding: 30px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #9AC8E4;
+      box-shadow: 0 10px 40px rgba(255, 182, 193, 0.3);
+      animation: headerGlow 3s ease-in-out infinite;
       border-radius: 15px;
       color: white;
     }
@@ -168,7 +170,7 @@ block extraCSS
     }
 
     .favorite-btn.favorited {
-      background: #ff6b6b;
+      background: #FFA7A6;
     }
 
     .favorite-btn:hover {
@@ -180,7 +182,8 @@ block extraCSS
     }
 
     .rate-btn:hover {
-      background: #667eea;
+      background: #9AC8E4;
+      animation: buttonPulse 2s ease-in-out infinite;
     }
 
     .card-bottom {
@@ -202,7 +205,7 @@ block extraCSS
     }
 
     .card-bottom h3 a:hover {
-      color: #667eea;
+      color: #FFA7A6;
     }
 
     .meta {
@@ -283,7 +286,8 @@ block extraCSS
       align-items: center;
       gap: 10px;
       padding: 12px 30px;
-      background: #667eea;
+      background: #9AC8E4;
+      animation: buttonPulse 2s ease-in-out infinite;
       color: white;
       border-radius: 25px;
       font-weight: 500;
@@ -291,8 +295,71 @@ block extraCSS
     }
 
     .btn-action:hover {
-      background: #764ba2;
-      transform: translateY(-2px);
+      background: #9AC8E4;
+      box-shadow: 0 8px 25px rgba(255, 182, 193, 0.4);
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    /* 动画效果 */
+    @keyframes headerGlow {
+      0%, 100% {
+        box-shadow: 0 10px 40px rgba(255, 182, 193, 0.3);
+      }
+      50% {
+        box-shadow: 0 15px 50px rgba(255, 182, 193, 0.5);
+      }
+    }
+
+    @keyframes buttonPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes cardFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .movie-card {
+      animation: cardFloat 3s ease-in-out infinite;
+    }
+
+    .movie-card:nth-child(2n) {
+      animation-delay: 0.5s;
+    }
+
+    .movie-card:nth-child(3n) {
+      animation-delay: 1s;
+    }
+
+    .rate-btn:hover {
+      background: #9AC8E4;
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .favorite-btn.favorited {
+      background: #FFA7A6;
+      animation: heartBeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% {
+        transform: scale(1);
+      }
+      25% {
+        transform: scale(1.1);
+      }
+      50% {
+        transform: scale(1);
+      }
     }
 
 block extraJS

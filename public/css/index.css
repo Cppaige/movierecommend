@@ -7,8 +7,8 @@
 
 body {
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background-color: #000; /* 全局黑色底色 */
-  color: #fff; /* 全局白色文字 */
+  background-color: #F0F3F5;
+  color: #333;
   line-height: 1.6;
 }
 
@@ -32,34 +32,37 @@ ul {
 }
 
 .btn-cta {
-  background-color: #fff;
-  color: #000;
+  background: #9AC8E4;
+  color: white;
   font-weight: 600;
 }
 
 .btn-cta:hover {
-  background-color: #eee;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(154, 200, 228, 0.4);
 }
 
 .btn-login, .btn-login-small {
   background-color: transparent;
-  color: #fff;
-  border: 1px solid #fff;
+  color: #9AC8E4;
+  border: 1px solid #9AC8E4;
   margin-right: 10px;
 }
 
 .btn-login:hover, .btn-login-small:hover {
-  background-color: rgba(255,255,255,0.1);
+  background-color: #9AC8E4;
+  color: white;
 }
 
 .btn-signup {
-  background-color: #fff;
-  color: #000;
+  background: #9AC8E4;
+  color: white;
   font-weight: 600;
 }
 
 .btn-signup:hover {
-  background-color: #eee;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(154, 200, 228, 0.4);
 }
 
 .btn-logout {
@@ -82,8 +85,8 @@ ul {
   top: 0;
   left: 0;
   right: 0;
-  background-color: #000; /* 导航栏黑色 */
-  box-shadow: 0 2px 10px rgba(255,255,255,0.1);
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   z-index: 999;
 }
 
@@ -101,7 +104,7 @@ ul {
   align-items: center;
   font-size: 24px;
   font-weight: bold;
-  color: #fff;
+  color: #9AC8E4;
 }
 
 .logo i {
@@ -123,10 +126,12 @@ ul {
   padding: 5px 0;
   border-bottom: 2px solid transparent;
   transition: border-color 0.3s ease;
+  color: #555;
 }
 
 .main-nav a.active, .main-nav a:hover {
-  border-color: #fff;
+  border-color: #9AC8E4;
+  color: #9AC8E4;
 }
 
 .user-info {
@@ -135,11 +140,11 @@ ul {
   font-size: 16px;
 }
 
-/* 轮播区（黑色底色，修复轮播样式） */
+/* 轮播区 */
 .hero {
   margin-top: 80px;
   padding: 50px 0;
-  background-color: #000; /* 轮播区黑色 */
+  background-color: #F0F3F5;
 }
 
 .hero-container {
@@ -256,23 +261,23 @@ ul {
 .movie-intro h2 {
   font-size: 36px;
   margin-bottom: 20px;
-  color: #fff;
+  color: #333;
 }
 
 .movie-intro p {
   font-size: 18px;
-  color: #ddd;
+  color: #666;
   line-height: 1.8;
   max-width: 600px;
 }
 
-/* 使用指南区（黑色底色） */
+/* 使用指南区 */
 .how-it-works {
   padding: 80px 0;
   max-width: 1200px;
   margin: 0 auto;
   padding: 80px 20px;
-  background-color: #000;
+  background-color: white;
 }
 
 .section-head {
@@ -283,12 +288,12 @@ ul {
 .section-head h2 {
   font-size: 32px;
   margin-bottom: 15px;
-  color: #fff;
+  color: #333;
 }
 
 .section-head p {
   font-size: 18px;
-  color: #bbb;
+  color: #666;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -308,8 +313,8 @@ ul {
 .step-icon {
   width: 60px;
   height: 60px;
-  background-color: #fff;
-  color: #000;
+  background: #9AC8E4;
+  color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -322,19 +327,19 @@ ul {
 .step-content h3 {
   font-size: 20px;
   margin-bottom: 10px;
-  color: #fff;
+  color: #333;
 }
 
 .step-content p {
   font-size: 16px;
-  color: #bbb;
+  color: #666;
   line-height: 1.6;
 }
 
-/* 评分入口区（黑色底色） */
+/* 评分入口区 */
 .rating-entry {
   padding: 80px 0;
-  background-color: #111; /* 深灰黑色，区分区域 */
+  background: #9AC8E4;
   text-align: center;
 }
 
@@ -347,37 +352,39 @@ ul {
 .rating-entry h2 {
   font-size: 32px;
   margin-bottom: 20px;
-  color: #fff;
+  color: white;
 }
 
 .rating-entry p {
   font-size: 18px;
-  color: #bbb;
+  color: white;
+  opacity: 0.95;
   margin-bottom: 30px;
 }
 
 .rating-entry .tip {
   font-size: 14px;
-  color: #888;
+  color: white;
+  opacity: 0.85;
   margin-top: 15px;
 }
 
-/* 个性化推荐区（黑色底色） */
+/* 个性化推荐区 */
 .recommend {
   padding: 80px 0;
   max-width: 1200px;
   margin: 0 auto;
   padding: 80px 20px;
-  background-color: #000;
+  background-color: #F0F3F5;
 }
 
-/* 电影库（黑色底色，下移到推荐区后） */
+/* 电影库 */
 .library {
   padding: 80px 0;
   max-width: 1200px;
   margin: 0 auto;
   padding: 80px 20px;
-  background-color: #111; /* 深灰黑色，区分区域 */
+  background-color: white;
 }
 
 .movies-grid {
@@ -388,17 +395,17 @@ ul {
 }
 
 .movie-card {
-  background-color: #1a1a1a; /* 卡片深灰黑 */
+  background-color: white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.5);
+  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
   transition: transform 0.3s ease;
   cursor: pointer;
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(255,255,255,0.1);
+  box-shadow: 0 8px 25px rgba(154, 200, 228, 0.3);
 }
 
 .card-top {
@@ -418,19 +425,19 @@ ul {
   right: 15px;
   width: 40px;
   height: 40px;
-  background-color: rgba(0,0,0,0.8);
-  border: 1px solid #fff;
+  background: #9AC8E4;
+  border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: white;
   transition: all 0.3s ease;
 }
 
 .rate-btn:hover {
-  background-color: #fff;
-  color: #000;
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(154, 200, 228, 0.4);
 }
 
 .card-bottom {
@@ -440,7 +447,7 @@ ul {
 .card-bottom h3 {
   font-size: 18px;
   margin-bottom: 10px;
-  color: #fff;
+  color: #333;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -450,19 +457,20 @@ ul {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  color: #aaa;
+  color: #666;
 }
 
 .view-all {
   display: inline-block;
   margin-top: 10px;
   font-size: 16px;
-  color: #fff;
+  color: #9AC8E4;
   font-weight: 500;
 }
 
 .view-all:hover {
   text-decoration: underline;
+  color: #FFA7A6;
 }
 
 .empty-state {
@@ -492,14 +500,14 @@ ul {
   font-size: 16px;
 }
 
-/* 评分弹窗（黑色风格） */
+/* 评分弹窗 */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(0,0,0,0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -515,13 +523,13 @@ ul {
 }
 
 .modal-inner {
-  background-color: #1a1a1a;
+  background-color: white;
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
   padding: 20px;
   position: relative;
-  border: 1px solid #333;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
 .modal-close {
@@ -558,24 +566,24 @@ ul {
 
 .movie-info h3 {
   font-size: 22px;
-  color: #fff;
+  color: #333;
 }
 
 .movie-info p {
   font-size: 16px;
-  color: #aaa;
+  color: #666;
 }
 
 .stars {
   display: flex;
   gap: 10px;
   font-size: 24px;
-  color: #444;
+  color: #ddd;
   cursor: pointer;
 }
 
 .stars i:hover {
-  color: #fff;
+  color: #FFA7A6;
   transform: scale(1.1);
   transition: all 0.2s ease;
 }
@@ -604,22 +612,23 @@ ul {
 }
 
 .btn-submit {
-  background-color: #fff;
-  color: #000;
+  background: #9AC8E4;
+  color: white;
   font-weight: 600;
 }
 
 .btn-submit:hover {
-  background-color: #eee;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(154, 200, 228, 0.4);
 }
 
-/* 页脚（黑色居中） */
+/* 页脚 */
 footer {
-  background-color: #000;
-  color: #fff;
+  background-color: #2c3e50;
+  color: white;
   padding: 50px 0;
   text-align: center;
-  border-top: 1px solid #222;
+  border-top: 1px solid #34495e;
 }
 
 .footer-container {
@@ -631,7 +640,7 @@ footer {
 .footer-container .logo {
   justify-content: center;
   margin-bottom: 30px;
-  color: #fff;
+  color: #9AC8E4;
 }
 
 .links {
@@ -748,13 +757,13 @@ footer {
 
 .favorite-btn:hover {
   background-color: rgba(0,0,0,0.8);
-  border-color: #ff6b6b;
+  border-color: #FFA7A6;
   transform: scale(1.1);
 }
 
 .favorite-btn.favorited {
-  background-color: #ff6b6b;
-  border-color: #ff6b6b;
+  background-color: #FFA7A6;
+  border-color: #FFA7A6;
   color: #fff;
 }
 

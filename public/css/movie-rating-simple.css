@@ -6,7 +6,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #9AC8E4;
   min-height: 100vh;
   font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
 }
@@ -46,7 +46,7 @@ body {
 
 .user-welcome {
   display: inline-block;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
   padding: 8px 20px;
   border-radius: 20px;
@@ -100,7 +100,7 @@ body {
 
 .progress-header i,
 .batch-header i {
-  color: #667eea;
+  color: #9AC8E4;
 }
 
 .progress-content {
@@ -148,7 +148,7 @@ body {
   display: block;
   font-size: 2rem;
   font-weight: bold;
-  color: #667eea;
+  color: #9AC8E4;
 }
 
 .progress-total {
@@ -175,7 +175,7 @@ body {
 }
 
 .progress-info i {
-  color: #667eea;
+  color: #9AC8E4;
   margin-right: 8px;
 }
 
@@ -196,9 +196,9 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 2px solid #667eea;
+  border: 2px solid #9AC8E4;
   background: white;
-  color: #667eea;
+  color: #9AC8E4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,7 +208,7 @@ body {
 }
 
 .batch-btn:hover {
-  background: #667eea;
+  background: #9AC8E4;
   color: white;
   transform: scale(1.1);
 }
@@ -230,7 +230,7 @@ body {
   padding: 16px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
   font-size: 1.1rem;
   font-weight: 600;
@@ -332,7 +332,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
   font-size: 3rem;
 }
@@ -542,7 +542,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
   font-size: 3rem;
 }
@@ -575,7 +575,7 @@ body {
 }
 
 .meta-item i {
-  color: #667eea;
+  color: #9AC8E4;
 }
 
 /* 评分区域 */
@@ -631,7 +631,7 @@ body {
 
 .rating-desc {
   font-size: 1.1rem;
-  color: #667eea;
+  color: #9AC8E4;
   font-weight: 500;
 }
 
@@ -658,9 +658,9 @@ body {
 }
 
 .quick-btn:hover {
-  border-color: #667eea;
+  border-color: #9AC8E4;
   background: #f8f9ff;
-  color: #667eea;
+  color: #9AC8E4;
   transform: translateY(-2px);
 }
 
@@ -695,7 +695,7 @@ body {
 }
 
 .btn-confirm {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #9AC8E4;
   color: white;
 }
 
@@ -735,11 +735,11 @@ body {
 }
 
 .toast-success {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  background: #2ecc71;
 }
 
 .toast-error {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  background: #e74c3c;
 }
 
 /* 无电影数据 */
